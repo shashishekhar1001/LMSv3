@@ -1,0 +1,205 @@
+
+/**
+ * Boot
+ * 
+ * @note    This singleton is not using /app/static/js/helpers/singleton.js
+ *          because jQuery is not available at the time that this class is
+ *          executed/used, and jQuery is required (at the moment) for merging
+ *          the singleton with the returned object.
+ * @access  public
+ * @var     Object
+ */
+var Boot = (function() {
+
+    /**
+     * __classType
+     * 
+     * @access  private
+     * @var     String (default: 'boot')
+     */
+    var __classType = 'boot';
+
+    /**
+     * __external
+     * 
+     * @access  private
+     * @param   Object options
+     * @param   undefined|Function callback
+     * @return  void
+     */
+    var __external = function(options, callback) {
+
+        // Boot
+        window.SENTRYDSN = options.sentry.auth.key;
+        window[namespace].require(options.scripts);
+        window[namespace].ready(function() {
+            window[namespace].js(function() {
+                window[namespace].queue.process();
+                callback && callback();
+            });
+        });
+
+        // Send message that the iframe is alive
+        window.parent.postMessage(
+            JSON.stringify({
+                action: 'message.app.alive'
+            }),
+            '*'
+        );
+
+        // Listeners
+        var listener = function(event) {
+            if (
+                event.data !== undefined
+                && event.data !== null
+                && event.data[0] === '{'
+            ) {
+                var data = JSON.parse(event.data);
+                if (data.action === 'message.app.init') {
+                    var body = document.getElementsByTagName('body')[0];
+                    body.className = (body.className) + ' down';
+                    (function() {
+                        Stencil.init(options);
+                    }).delay(options.delays.slide);
+                }
+            }
+        };
+        window.addEventListener
+            ? addEventListener('message', listener, false)
+            : attachEvent('onmessage', listener);
+    };
+
+    /**
+     * __internal
+     * 
+     * @access  private
+     * @param   Object options
+     * @param   undefined|Function callback
+     * @return  void
+     */
+    var __internal = function(options, callback) {
+        window.SENTRYDSN = options.sentry.auth.key;
+        window[namespace].require(options.scripts);
+        window[namespace].ready(function() {
+            window[namespace].js(function() {
+                window[namespace].queue.process();
+                Stencil.init(options);
+                callback && callback();
+            });
+        });
+    };
+
+    /**
+     * __showPossibleNotification
+     * 
+     * @access  private
+     * @param   Object notificationObject
+     * @return  void
+     */
+    var __showPossibleNotification = function(notificationObject) {
+        var $body = jQuery('body');
+        if (
+            $body.hasClass('external') === true
+            && $body.hasClass('extension') === true
+            && UserAgent.supports.localStorage() === true
+        ) {
+            if (Notification !== undefined && Notification !== null) {
+                if (Notification.permission === 'granted') {
+                    // var lastShown = Cookies.get('nativeNotificationLastShown');
+                    var lastShown = localStorage.getItem('stencil.nativeNotificationLastShown');
+                    if (lastShown !== notificationObject.stamp) {
+                        // Stencil.cookies.set('nativeNotificationLastShown', notificationObject.stamp);
+                        localStorage.setItem('stencil.nativeNotificationLastShown', notificationObject.stamp);
+                        var notification = new Notification(notificationObject.title, {
+                            icon: notificationObject.icon,
+                            body: notificationObject.body,
+                        });
+                        notification.onclick = function() {
+                            window.open(notificationObject.url);
+                        };
+                        setTimeout(function() {
+                            notification.close();
+                        }, notificationObject.timeout);
+                    }
+                }
+            }
+        }
+    };
+
+    /**
+     * __showConsoleLog
+     * 
+     * @see     https://developers.google.com/web/tools/chrome-devtools/console/console-write
+     * @access  private
+     * @param   Object options
+     * @return  void
+     */
+    var __showConsoleLog = function(options) {
+        if (options.source.external === false && options.role !== 'local') {
+            if (window.console && window.console.log) {
+                console.log('%c\n' +
+                    '   _____ __                  _ __\n'     +
+                    '  / ___// /____  ____  _____(_) /\n'     +
+                    '  \\__ \\/ __/ _ \\/ __ \\/ ___/ / / \n' +
+                    ' ___/ / /_/  __/ / / / /__/ / /  \n'     +
+                    '/____/\\__/\\___/_/ /_/\\___/_/_/   \n'  +
+                    '\n\n',
+                    'font-family: \'Courier\'; font-weight: 900; font-size: 11px;'
+                );
+            }
+        }
+    };
+
+    /**
+     * __string
+     * 
+     * @access  private
+     * @var     String (default: 'Boot')
+     */
+    var __string = 'Boot';
+
+    // Public methods
+    return {
+
+        /**
+         * app
+         * 
+         * @access  private
+         * @param   Object options
+         * @return  void
+         */
+        app: function(options) {
+            __showConsoleLog(options);
+            if (
+                options.source.external === true
+                && options.source.external === true
+            ) {
+                __external(options, function() {
+                    __showPossibleNotification(options.notifications.current);
+                });
+            } else {
+                __internal(options);
+            }
+        },
+
+        /**
+         * getClassType
+         * 
+         * @access  public
+         * @return  String
+         */
+        getClassType: function() {
+            return __classType;
+        },
+
+        /**
+         * toString
+         * 
+         * @access  public
+         * @return  String
+         */
+        toString: function() {
+            return __string;
+        }
+    };
+})();

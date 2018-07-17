@@ -1,0 +1,85 @@
+var countryEu = ['RS', 'VA', 'GB', 'UA', 'CH', 'SE', 'ES', 'SI', 'SK', 'RS', 'SM', 'RU', 'RO', 'PT', 'PL', 'NO', 'NL', 'ME', 'MC', 'MD', 'MT', 'MK', 'LU', 'LT', 'LI', 'LV', 'RS', 'IT', 'IM', 'IE', 'IS', 'HU', 'GR', 'GI', 'DE', 'FR', 'FI', 'FO', 'EE', 'DK', 'CZ', 'CY', 'HR', 'BG', 'BA', 'BE', 'BY', 'AT', 'AD', 'AL'];
+	var langArr = ['en', 'fr', 'de', 'es-xl', 'pt-br', 'jp'];
+	var currentUrlLang = '';
+	var getDomain = document.domain;
+	var splitUrl = getDomain.split('.');
+	var domainOne = splitUrl.pop();
+	var Zdomain = splitUrl.pop();
+	function findeLanguage(){
+		var lVal = '';
+		langArr.forEach(function(index){
+		   if(window.location.href.split('/').indexOf(index) > -1){
+				lVal = index;
+		   }
+		});
+		currentUrlLang = lVal;
+		(currentUrlLang != '') ? (langsrc = '/'+currentUrlLang+'/') : '';
+		if(lVal == 'es-xl'){
+			lVal = 'es';	
+		}else if(lVal == 'pt-br'){
+			lVal = 'pt';	
+		}
+		return lVal;
+	}
+	
+	function ipcallbk_getUrlParam(sParam) {
+		var sPageURL = decodeURIComponent(window.location.search.substring(1)),sURLVariables = sPageURL.split('&'),sParameterName,i;
+		for (i = 0; i < sURLVariables.length; i++) {
+			sParameterName = sURLVariables[i].split('=');
+			if (sParameterName[0] === sParam) {
+				return sParameterName[1] === undefined ? true : sParameterName[1];
+			}else{return '';}
+		}
+	}
+
+	var ipIntervalTime;
+	var currentLang = findeLanguage();
+	
+	function ipCallBack(ipData){
+		CountryCode = ipData.COUNTRY_CODE;
+		
+		if(window.location.hostname == "prezoho.zoho.com"){
+			if(ipcallbk_getUrlParam('autoCC')!=""){
+				var autoCCVal=ipcallbk_getUrlParam('autoCC');
+				if(autoCCVal.length==2){
+					CountryCode=autoCCVal;
+				}
+			}
+		}
+		
+			if(currentUrlLang != 'jp'){
+				if(typeof CountryCode != 'undefined') {
+					var intr = setInterval(function(){
+						if(document.getElementsByTagName('body').length > 0){
+							var _element = document.getElementsByTagName('body')[0];
+   							_element.classList.add("ccode-"+CountryCode.toLowerCase());	
+							clearInterval(intr);	
+						}
+					}, 10);
+					var _zcom = 'com', _zeu = 'eu';
+					var _lo = window.location.href;	
+					if(window.location.href.indexOf('?rdc') > -1){
+						try {
+							localStorage.setItem('lanchanged', '1');
+						}catch(err) {}	
+					}
+					var langStorage = localStorage.getItem('lanchanged') == '1';
+					try {
+						localStorage.setItem('lanchanged', '1');
+					}catch(err) {
+						langStorage = true;
+					}
+					
+					if(countryEu.indexOf(CountryCode) > -1 && !langStorage && domainOne != 'eu'){
+						_lo = encodeURI(_lo.split('zoho.'+_zcom).join('zoho.'+_zeu));
+						window.location = _lo;
+					}
+				}
+			}
+			
+		ipIntervalTime = setInterval(function(){
+			if(typeof EuRedirection != 'undefined'){
+				ipLoaded();
+			}
+		}, 100);
+	}

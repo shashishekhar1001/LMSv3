@@ -1,0 +1,16 @@
+.menu-icon-help-header>a img {width: 40px;margin-top: -2px;}
+.pane-quicklinks-features{display:none}
+.features-item .cont-part ul li{background: none;}
+/**************Feedback CSS**************/
+.feedback{ width:100%; max-width:500px; } .helpful-wrap > div.feedback span a{ transition:0.5s all ease; } .feedback a.thickbox{ cursor:pointer; } .help-docs-feedback-form{ width:100%; display:none; } .feedback .success-mesg, .feedback .yes-msg{ color: #4f8a10; display: none; font-family: "proxima_novasemibold"; font-size: 22px; margin-top: 10px; padding: 20px 0; width: 100%; } .feedback .help-docs-feedback-form .input-container, .feedback .help-docs-feedback-form .textarea-container{ width:100%; margin-top: 20px; } .feedback .help-docs-feedback-form .input-container > input, .feedback .help-docs-feedback-form .textarea-container > textarea{ box-sizing:border-box; border: 1px solid #eee; padding: 10px; width:100%; -moz-appearance: none; appearance:none; -webkit-appearance:none; } .feedback .help-docs-feedback-form input-container{ margin-top: 10px; } .feedback .help-docs-feedback-form .zbtn{ -moz-appearance: none; appearance:none; -webkit-appearance:none; background: #35cc5c none repeat scroll 0 0; border: 1px solid #35cc5c; color: #fff; font-family: proxima_novasemibold; font-size: 14px; margin-top: 25px; padding: 7px 25px; text-transform: uppercase; cursor:pointer; } .feedback .help-docs-feedback-form label{ color: #333; display: block; font-size: 14px; margin-bottom: 5px; } .feedback label.error { clear: both; color: red; display: block; line-height: 20px; }
+/**************Feedback CSS**************/
+
+#ud, .block-zoho-navigation-links {
+display:none;
+}
+.help-menu-panel li{font-size: inherit;}
+.help-menu-panel li.hasChild.open ul{font-size:14px;}
+
+/*** For other languages ***/
+.common-links.remove-before:before{display: none;}
+/*** For other languages ***/

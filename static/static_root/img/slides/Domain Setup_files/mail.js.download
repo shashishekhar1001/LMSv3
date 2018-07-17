@@ -1,0 +1,674 @@
+   /************************************************************************************************************/
+  /****************************************Footer Content Starts****************************************/
+ /**********************************************************************************************************/
+jQuery(document).ready(function(){
+
+window.onload = function(){
+	if($('body').hasClass('node-type-features')){
+       var allFeatures = '<div class="all-features"><h2 class="pane-title">'+ Drupal.t("ALL FEATURES")+'</h2> <div class="pane-content"><ul class="menu nav"><li class="first leaf"><a href="'+langsrc+'mail/webmail.html">'+ Drupal.t("Organized Inbox")+'</a></li> <li class="leaf"><a href="'+langsrc+'mail/advanced-features.html">'+ Drupal.t("Advanced Features")+'</a></li><li class="leaf"><a href="'+langsrc+'mail/online-office-apps.html">'+ Drupal.t("Online Office")+'</a></li><li class="leaf"><a href="'+langsrc+'mail/anywhere-access.html">'+ Drupal.t("Anywhere Access")+'</a></li> <li class="leaf"><a href="'+langsrc+'mail/control-panel.html">'+ Drupal.t("Control Panel")+'</a></li><li class="leaf"><a href="'+langsrc+'mail/migration.html">'+ Drupal.t("Migration Options")+'</a></li><li class="leaf"><a href="'+langsrc+'mail/email-crm-integration.html">'+ Drupal.t("Email &amp; CRM Integration")+'</a></li><li class="leaf"><a href="'+langsrc+'mail/ios-android-apps.html">'+ Drupal.t("IOS, Android Apps")+'</a></li> <li class="leaf"><a href="'+langsrc+'mail/domain-management.html">'+ Drupal.t("Domain Management")+'</a></li><li class="leaf"><a href="'+langsrc+'mail/calendar.html">'+ Drupal.t("Beyond Mail")+'</a></li> <li class="leaf"><a href="'+langsrc+'mail/group-management.html">'+ Drupal.t("Group Management")+'</a></li><li class="leaf"><a href="'+langsrc+'mail/email-accounts.html">'+ Drupal.t("Email Accounts")+'</a></li><li class="leaf"><a href="'+langsrc+'mail/email-policy-management.html">'+ Drupal.t("Email Policy Management")+'</a></li></ul></div></div>';
+	
+      jQuery(allFeatures).insertBefore('.footer-wrapper'); 
+      }
+
+      if(currentUrlLang == 'fr' || currentUrlLang == 'de' || currentUrlLang == 'pt-br' || currentUrlLang == 'es-xl'){
+             $(".all-features ul li:nth-child(4), .all-features ul li:nth-child(5), .all-features ul li:nth-child(6), .all-features ul li:nth-child(7)").css('display','none');
+      }
+}
+
+	var footerLinks  = '<div class="product-links one-column"> <div><ul><li><a href="/mail/features.html" title="">Features</a></li><li><a href="/mail/mobile/index.html" title="">Mobile Apps</a></li><li><a href="/mail/zohomail-pricing.html" title="">Pricing &amp; Sign Up</a></li><li><a href="/mail/help/index.html" title="">Resources</a></li><li><a href="https://forums.zoho.com/zoho-mail" target="_blank&quot;" title="">Forum</a></li></ul></div> </div>';
+	
+	var footer = "<div class='region region-footer'><section id='block-zoho-navigation-links-product-pages-footer-links'><div class='footer-sec-wrap'><div class='content-wrap'><div class='footer-links-wrap'>"+footerLinks+"<div class='common-links common-links-js'></div></div></div></section></div>";
+	
+	jQuery('.footer-wrapper footer').append(footer);
+
+     $(".node-type-features .container.padding0i .all-features").css("display","none"); // Menu from mini panel
+
+        if(currentUrlLang == 'fr' || currentUrlLang == 'de' || currentUrlLang == 'pt-br' || currentUrlLang == 'es-xl'){
+             $(".product-links.one-column").css('display','none');
+             $('.common-links').addClass('remove-before');
+            if(window.innerWidth > 767){
+              $('.product-nav-links > ul.menu').append('<li class="last leaf"><a href="/mail/help/index.html" target="_blank">Resources</a></li>');
+              $('.product-nav-links > ul.menu li:last-child').prev().removeClass("last");
+            }
+            else{
+             $('<li class="leaf"><a href="/mail/help/index.html" target="_blank">Resources</a></li>').insertBefore('.product-nav-links > ul.menu li.featured-apps-part');
+            }
+        }
+        if(currentUrlLang == 'jp'){
+             $(".product-links.one-column").css('display','none');
+             $('.common-links').addClass('remove-before');
+        }
+});
+
+jQuery(document).ready(function(){
+    if($('body').hasClass('node-tnid-22820')){
+
+		if(domainOne=="eu"){
+			changeCurrency('euro');
+		}
+		else{
+			if(CountryCode == "IN"){
+				changeCurrency('inr');
+			} else if(CountryCode == "DE"){
+				changeCurrency('euro');
+                        } else{
+				changeCurrency('usd');
+                        }
+		}
+    }
+});
+    function changeCurrency(e){
+		$('.priceChangeAmt').each(function(index, element) {
+                        var inrAmt=$(this).attr('data-inr');
+			var usdAmt=$(this).attr('data-usd');
+			var poundsAmt=$(this).attr('data-pounds');
+			if(e=='inr'){
+				$('.priceChangetxt').text('₹');
+				$(this).text(inrAmt);
+			}
+			else if(e=='usd'){
+				$('.priceChangetxt').text('$');
+				$(this).text(usdAmt);
+			}
+			else if(e=='euro'){
+				$('.priceChangetxt').text('€');
+				$(this).text(usdAmt);
+			}
+			else if(e=='pound'){
+				$('.priceChangetxt').text('£');
+				$(this).text(poundsAmt);
+			}
+        });
+    }
+
+   /***********************************************************************************************************/
+  /****************************************Footer Content Ends***************************************/
+ /*********************************************************************************************************/
+
+/* Validate JS */
+
+/**
+ * jQuery Validation Plugin 1.9.0
+ *
+ * http://bassistance.de/jquery-plugins/jquery-plugin-validation/
+ * http://docs.jquery.com/Plugins/Validation
+ *
+ * Copyright (c) 2006 - 2011 JÃƒÆ’Ã‚Â¶rn Zaefferer
+ *
+ * Dual licensed under the MIT and GPL licenses:
+ *   http://www.opensource.org/licenses/mit-license.php
+ *   http://www.gnu.org/licenses/gpl.html
+ */
+ 
+ 
+(function(c){c.extend(c.fn,{validate:function(a){if(this.length){var b=c.data(this[0],"validator");if(b)return b;this.attr("novalidate","novalidate");b=new c.validator(a,this[0]);c.data(this[0],"validator",b);if(b.settings.onsubmit){a=this.find("input, button");a.filter(".cancel").click(function(){b.cancelSubmit=true});b.settings.submitHandler&&a.filter(":submit").click(function(){b.submitButton=this});this.submit(function(d){function e(){if(b.settings.submitHandler){if(b.submitButton)var f=c("<input type='hidden'/>").attr("name",
+b.submitButton.name).val(b.submitButton.value).appendTo(b.currentForm);b.settings.submitHandler.call(b,b.currentForm);b.submitButton&&f.remove();return false}return true}b.settings.debug&&d.preventDefault();if(b.cancelSubmit){b.cancelSubmit=false;return e()}if(b.form()){if(b.pendingRequest){b.formSubmitted=true;return false}return e()}else{b.focusInvalid();return false}})}return b}else a&&a.debug&&window.console&&console.warn("nothing selected, can't validate, returning nothing")},valid:function(){if(c(this[0]).is("form"))return this.validate().form();
+else{var a=true,b=c(this[0].form).validate();this.each(function(){a&=b.element(this)});return a}},removeAttrs:function(a){var b={},d=this;c.each(a.split(/\s/),function(e,f){b[f]=d.attr(f);d.removeAttr(f)});return b},rules:function(a,b){var d=this[0];if(a){var e=c.data(d.form,"validator").settings,f=e.rules,g=c.validator.staticRules(d);switch(a){case "add":c.extend(g,c.validator.normalizeRule(b));f[d.name]=g;if(b.messages)e.messages[d.name]=c.extend(e.messages[d.name],b.messages);break;case "remove":if(!b){delete f[d.name];
+return g}var h={};c.each(b.split(/\s/),function(j,i){h[i]=g[i];delete g[i]});return h}}d=c.validator.normalizeRules(c.extend({},c.validator.metadataRules(d),c.validator.classRules(d),c.validator.attributeRules(d),c.validator.staticRules(d)),d);if(d.required){e=d.required;delete d.required;d=c.extend({required:e},d)}return d}});c.extend(c.expr[":"],{blank:function(a){return!c.trim(""+a.value)},filled:function(a){return!!c.trim(""+a.value)},unchecked:function(a){return!a.checked}});c.validator=function(a,
+b){this.settings=c.extend(true,{},c.validator.defaults,a);this.currentForm=b;this.init()};c.validator.format=function(a,b){if(arguments.length==1)return function(){var d=c.makeArray(arguments);d.unshift(a);return c.validator.format.apply(this,d)};if(arguments.length>2&&b.constructor!=Array)b=c.makeArray(arguments).slice(1);if(b.constructor!=Array)b=[b];c.each(b,function(d,e){a=a.replace(RegExp("\\{"+d+"\\}","g"),e)});return a};c.extend(c.validator,{defaults:{messages:{},groups:{},rules:{},errorClass:"error",
+validClass:"valid",errorElement:"label",focusInvalid:true,errorContainer:c([]),errorLabelContainer:c([]),onsubmit:true,ignore:":hidden",ignoreTitle:false,onfocusin:function(a){this.lastActive=a;if(this.settings.focusCleanup&&!this.blockFocusCleanup){this.settings.unhighlight&&this.settings.unhighlight.call(this,a,this.settings.errorClass,this.settings.validClass);this.addWrapper(this.errorsFor(a)).hide()}},onfocusout:function(a){if(!this.checkable(a)&&(a.name in this.submitted||!this.optional(a)))this.element(a)},
+onkeyup:function(a){if(a.name in this.submitted||a==this.lastElement)this.element(a)},onclick:function(a){if(a.name in this.submitted)this.element(a);else a.parentNode.name in this.submitted&&this.element(a.parentNode)},highlight:function(a,b,d){a.type==="radio"?this.findByName(a.name).addClass(b).removeClass(d):c(a).addClass(b).removeClass(d)},unhighlight:function(a,b,d){a.type==="radio"?this.findByName(a.name).removeClass(b).addClass(d):c(a).removeClass(b).addClass(d)}},setDefaults:function(a){c.extend(c.validator.defaults,
+a)},messages:{required:"This field is required.",remote:"Please fix this field.",email:"Please enter a valid email address.",url:"Please enter a valid URL.",date:"Please enter a valid date.",dateISO:"Please enter a valid date (ISO).",number:"Please enter a valid number.",digits:"Please enter only digits.",creditcard:"Please enter a valid credit card number.",equalTo:"Please enter the same value again.",accept:"Please enter a value with a valid extension.",maxlength:c.validator.format("Please enter no more than {0} characters."),
+minlength:c.validator.format("Please enter at least {0} characters."),rangelength:c.validator.format("Please enter a value between {0} and {1} characters long."),range:c.validator.format("Please enter a value between {0} and {1}."),max:c.validator.format("Please enter a value less than or equal to {0}."),min:c.validator.format("Please enter a value greater than or equal to {0}.")},autoCreateRanges:false,prototype:{init:function(){function a(e){var f=c.data(this[0].form,"validator"),g="on"+e.type.replace(/^validate/,
+"");f.settings[g]&&f.settings[g].call(f,this[0],e)}this.labelContainer=c(this.settings.errorLabelContainer);this.errorContext=this.labelContainer.length&&this.labelContainer||c(this.currentForm);this.containers=c(this.settings.errorContainer).add(this.settings.errorLabelContainer);this.submitted={};this.valueCache={};this.pendingRequest=0;this.pending={};this.invalid={};this.reset();var b=this.groups={};c.each(this.settings.groups,function(e,f){c.each(f.split(/\s/),function(g,h){b[h]=e})});var d=
+this.settings.rules;c.each(d,function(e,f){d[e]=c.validator.normalizeRule(f)});c(this.currentForm).validateDelegate("[type='text'], [type='password'], [type='file'], select, textarea, [type='number'], [type='search'] ,[type='tel'], [type='url'], [type='email'], [type='datetime'], [type='date'], [type='month'], [type='week'], [type='time'], [type='datetime-local'], [type='range'], [type='color'] ","focusin focusout keyup",a).validateDelegate("[type='radio'], [type='checkbox'], select, option","click",
+a);this.settings.invalidHandler&&c(this.currentForm).bind("invalid-form.validate",this.settings.invalidHandler)},form:function(){this.checkForm();c.extend(this.submitted,this.errorMap);this.invalid=c.extend({},this.errorMap);this.valid()||c(this.currentForm).triggerHandler("invalid-form",[this]);this.showErrors();return this.valid()},checkForm:function(){this.prepareForm();for(var a=0,b=this.currentElements=this.elements();b[a];a++)this.check(b[a]);return this.valid()},element:function(a){this.lastElement=
+a=this.validationTargetFor(this.clean(a));this.prepareElement(a);this.currentElements=c(a);var b=this.check(a);if(b)delete this.invalid[a.name];else this.invalid[a.name]=true;if(!this.numberOfInvalids())this.toHide=this.toHide.add(this.containers);this.showErrors();return b},showErrors:function(a){if(a){c.extend(this.errorMap,a);this.errorList=[];for(var b in a)this.errorList.push({message:a[b],element:this.findByName(b)[0]});this.successList=c.grep(this.successList,function(d){return!(d.name in a)})}this.settings.showErrors?
+this.settings.showErrors.call(this,this.errorMap,this.errorList):this.defaultShowErrors()},resetForm:function(){c.fn.resetForm&&c(this.currentForm).resetForm();this.submitted={};this.lastElement=null;this.prepareForm();this.hideErrors();this.elements().removeClass(this.settings.errorClass)},numberOfInvalids:function(){return this.objectLength(this.invalid)},objectLength:function(a){var b=0,d;for(d in a)b++;return b},hideErrors:function(){this.addWrapper(this.toHide).hide()},valid:function(){return this.size()==
+0},size:function(){return this.errorList.length},focusInvalid:function(){if(this.settings.focusInvalid)try{c(this.findLastActive()||this.errorList.length&&this.errorList[0].element||[]).filter(":visible").focus().trigger("focusin")}catch(a){}},findLastActive:function(){var a=this.lastActive;return a&&c.grep(this.errorList,function(b){return b.element.name==a.name}).length==1&&a},elements:function(){var a=this,b={};return c(this.currentForm).find("input, select, textarea").not(":submit, :reset, :image, [disabled]").not(this.settings.ignore).filter(function(){!this.name&&
+a.settings.debug&&window.console&&console.error("%o has no name assigned",this);if(this.name in b||!a.objectLength(c(this).rules()))return false;return b[this.name]=true})},clean:function(a){return c(a)[0]},errors:function(){return c(this.settings.errorElement+"."+this.settings.errorClass,this.errorContext)},reset:function(){this.successList=[];this.errorList=[];this.errorMap={};this.toShow=c([]);this.toHide=c([]);this.currentElements=c([])},prepareForm:function(){this.reset();this.toHide=this.errors().add(this.containers)},
+prepareElement:function(a){this.reset();this.toHide=this.errorsFor(a)},check:function(a){a=this.validationTargetFor(this.clean(a));var b=c(a).rules(),d=false,e;for(e in b){var f={method:e,parameters:b[e]};try{var g=c.validator.methods[e].call(this,a.value.replace(/\r/g,""),a,f.parameters);if(g=="dependency-mismatch")d=true;else{d=false;if(g=="pending"){this.toHide=this.toHide.not(this.errorsFor(a));return}if(!g){this.formatAndAdd(a,f);return false}}}catch(h){this.settings.debug&&window.console&&console.log("exception occured when checking element "+
+a.id+", check the '"+f.method+"' method",h);throw h;}}if(!d){this.objectLength(b)&&this.successList.push(a);return true}},customMetaMessage:function(a,b){if(c.metadata){var d=this.settings.meta?c(a).metadata()[this.settings.meta]:c(a).metadata();return d&&d.messages&&d.messages[b]}},customMessage:function(a,b){var d=this.settings.messages[a];return d&&(d.constructor==String?d:d[b])},findDefined:function(){for(var a=0;a<arguments.length;a++)if(arguments[a]!==undefined)return arguments[a]},defaultMessage:function(a,
+b){return this.findDefined(this.customMessage(a.name,b),this.customMetaMessage(a,b),!this.settings.ignoreTitle&&a.title||undefined,c.validator.messages[b],"<strong>Warning: No message defined for "+a.name+"</strong>")},formatAndAdd:function(a,b){var d=this.defaultMessage(a,b.method),e=/\$?\{(\d+)\}/g;if(typeof d=="function")d=d.call(this,b.parameters,a);else if(e.test(d))d=jQuery.format(d.replace(e,"{$1}"),b.parameters);this.errorList.push({message:d,element:a});this.errorMap[a.name]=d;this.submitted[a.name]=
+d},addWrapper:function(a){if(this.settings.wrapper)a=a.add(a.parent(this.settings.wrapper));return a},defaultShowErrors:function(){for(var a=0;this.errorList[a];a++){var b=this.errorList[a];this.settings.highlight&&this.settings.highlight.call(this,b.element,this.settings.errorClass,this.settings.validClass);this.showLabel(b.element,b.message)}if(this.errorList.length)this.toShow=this.toShow.add(this.containers);if(this.settings.success)for(a=0;this.successList[a];a++)this.showLabel(this.successList[a]);
+if(this.settings.unhighlight){a=0;for(b=this.validElements();b[a];a++)this.settings.unhighlight.call(this,b[a],this.settings.errorClass,this.settings.validClass)}this.toHide=this.toHide.not(this.toShow);this.hideErrors();this.addWrapper(this.toShow).show()},validElements:function(){return this.currentElements.not(this.invalidElements())},invalidElements:function(){return c(this.errorList).map(function(){return this.element})},showLabel:function(a,b){var d=this.errorsFor(a);if(d.length){d.removeClass(this.settings.validClass).addClass(this.settings.errorClass);
+d.attr("generated")&&d.html(b)}else{d=c("<"+this.settings.errorElement+"/>").attr({"for":this.idOrName(a),generated:true}).addClass(this.settings.errorClass).html(b||"");if(this.settings.wrapper)d=d.hide().show().wrap("<"+this.settings.wrapper+"/>").parent();this.labelContainer.append(d).length||(this.settings.errorPlacement?this.settings.errorPlacement(d,c(a)):d.insertAfter(a))}if(!b&&this.settings.success){d.text("");typeof this.settings.success=="string"?d.addClass(this.settings.success):this.settings.success(d)}this.toShow=
+this.toShow.add(d)},errorsFor:function(a){var b=this.idOrName(a);return this.errors().filter(function(){return c(this).attr("for")==b})},idOrName:function(a){return this.groups[a.name]||(this.checkable(a)?a.name:a.id||a.name)},validationTargetFor:function(a){if(this.checkable(a))a=this.findByName(a.name).not(this.settings.ignore)[0];return a},checkable:function(a){return/radio|checkbox/i.test(a.type)},findByName:function(a){var b=this.currentForm;return c(document.getElementsByName(a)).map(function(d,
+e){return e.form==b&&e.name==a&&e||null})},getLength:function(a,b){switch(b.nodeName.toLowerCase()){case "select":return c("option:selected",b).length;case "input":if(this.checkable(b))return this.findByName(b.name).filter(":checked").length}return a.length},depend:function(a,b){return this.dependTypes[typeof a]?this.dependTypes[typeof a](a,b):true},dependTypes:{"boolean":function(a){return a},string:function(a,b){return!!c(a,b.form).length},"function":function(a,b){return a(b)}},optional:function(a){return!c.validator.methods.required.call(this,
+c.trim(a.value),a)&&"dependency-mismatch"},startRequest:function(a){if(!this.pending[a.name]){this.pendingRequest++;this.pending[a.name]=true}},stopRequest:function(a,b){this.pendingRequest--;if(this.pendingRequest<0)this.pendingRequest=0;delete this.pending[a.name];if(b&&this.pendingRequest==0&&this.formSubmitted&&this.form()){c(this.currentForm).submit();this.formSubmitted=false}else if(!b&&this.pendingRequest==0&&this.formSubmitted){c(this.currentForm).triggerHandler("invalid-form",[this]);this.formSubmitted=
+false}},previousValue:function(a){return c.data(a,"previousValue")||c.data(a,"previousValue",{old:null,valid:true,message:this.defaultMessage(a,"remote")})}},classRuleSettings:{required:{required:true},email:{email:true},url:{url:true},date:{date:true},dateISO:{dateISO:true},dateDE:{dateDE:true},number:{number:true},numberDE:{numberDE:true},digits:{digits:true},creditcard:{creditcard:true}},addClassRules:function(a,b){a.constructor==String?this.classRuleSettings[a]=b:c.extend(this.classRuleSettings,
+a)},classRules:function(a){var b={};(a=c(a).attr("class"))&&c.each(a.split(" "),function(){this in c.validator.classRuleSettings&&c.extend(b,c.validator.classRuleSettings[this])});return b},attributeRules:function(a){var b={};a=c(a);for(var d in c.validator.methods){var e;if(e=d==="required"&&typeof c.fn.prop==="function"?a.prop(d):a.attr(d))b[d]=e;else if(a[0].getAttribute("type")===d)b[d]=true}b.maxlength&&/-1|2147483647|524288/.test(b.maxlength)&&delete b.maxlength;return b},metadataRules:function(a){if(!c.metadata)return{};
+var b=c.data(a.form,"validator").settings.meta;return b?c(a).metadata()[b]:c(a).metadata()},staticRules:function(a){var b={},d=c.data(a.form,"validator");if(d.settings.rules)b=c.validator.normalizeRule(d.settings.rules[a.name])||{};return b},normalizeRules:function(a,b){c.each(a,function(d,e){if(e===false)delete a[d];else if(e.param||e.depends){var f=true;switch(typeof e.depends){case "string":f=!!c(e.depends,b.form).length;break;case "function":f=e.depends.call(b,b)}if(f)a[d]=e.param!==undefined?
+e.param:true;else delete a[d]}});c.each(a,function(d,e){a[d]=c.isFunction(e)?e(b):e});c.each(["minlength","maxlength","min","max"],function(){if(a[this])a[this]=Number(a[this])});c.each(["rangelength","range"],function(){if(a[this])a[this]=[Number(a[this][0]),Number(a[this][1])]});if(c.validator.autoCreateRanges){if(a.min&&a.max){a.range=[a.min,a.max];delete a.min;delete a.max}if(a.minlength&&a.maxlength){a.rangelength=[a.minlength,a.maxlength];delete a.minlength;delete a.maxlength}}a.messages&&delete a.messages;
+return a},normalizeRule:function(a){if(typeof a=="string"){var b={};c.each(a.split(/\s/),function(){b[this]=true});a=b}return a},addMethod:function(a,b,d){c.validator.methods[a]=b;c.validator.messages[a]=d!=undefined?d:c.validator.messages[a];b.length<3&&c.validator.addClassRules(a,c.validator.normalizeRule(a))},methods:{required:function(a,b,d){if(!this.depend(d,b))return"dependency-mismatch";switch(b.nodeName.toLowerCase()){case "select":return(a=c(b).val())&&a.length>0;case "input":if(this.checkable(b))return this.getLength(a,
+b)>0;default:return c.trim(a).length>0}},remote:function(a,b,d){if(this.optional(b))return"dependency-mismatch";var e=this.previousValue(b);this.settings.messages[b.name]||(this.settings.messages[b.name]={});e.originalMessage=this.settings.messages[b.name].remote;this.settings.messages[b.name].remote=e.message;d=typeof d=="string"&&{url:d}||d;if(this.pending[b.name])return"pending";if(e.old===a)return e.valid;e.old=a;var f=this;this.startRequest(b);var g={};g[b.name]=a;c.ajax(c.extend(true,{url:d,
+mode:"abort",port:"validate"+b.name,dataType:"json",data:g,success:function(h){f.settings.messages[b.name].remote=e.originalMessage;var j=h===true;if(j){var i=f.formSubmitted;f.prepareElement(b);f.formSubmitted=i;f.successList.push(b);f.showErrors()}else{i={};h=h||f.defaultMessage(b,"remote");i[b.name]=e.message=c.isFunction(h)?h(a):h;f.showErrors(i)}e.valid=j;f.stopRequest(b,j)}},d));return"pending"},minlength:function(a,b,d){return this.optional(b)||this.getLength(c.trim(a),b)>=d},maxlength:function(a,
+b,d){return this.optional(b)||this.getLength(c.trim(a),b)<=d},rangelength:function(a,b,d){a=this.getLength(c.trim(a),b);return this.optional(b)||a>=d[0]&&a<=d[1]},min:function(a,b,d){return this.optional(b)||a>=d},max:function(a,b,d){return this.optional(b)||a<=d},range:function(a,b,d){return this.optional(b)||a>=d[0]&&a<=d[1]},email:function(a,b){return this.optional(b)||/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i.test(a)},
+url:function(a,b){return this.optional(b)||/^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(a)},
+date:function(a,b){return this.optional(b)||!/Invalid|NaN/.test(new Date(a))},dateISO:function(a,b){return this.optional(b)||/^\d{4}[\/-]\d{1,2}[\/-]\d{1,2}$/.test(a)},number:function(a,b){return this.optional(b)||/^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(a)},digits:function(a,b){return this.optional(b)||/^\d+$/.test(a)},creditcard:function(a,b){if(this.optional(b))return"dependency-mismatch";if(/[^0-9 -]+/.test(a))return false;var d=0,e=0,f=false;a=a.replace(/\D/g,"");for(var g=a.length-1;g>=
+0;g--){e=a.charAt(g);e=parseInt(e,10);if(f)if((e*=2)>9)e-=9;d+=e;f=!f}return d%10==0},accept:function(a,b,d){d=typeof d=="string"?d.replace(/,/g,"|"):"png|jpe?g|gif";return this.optional(b)||a.match(RegExp(".("+d+")$","i"))},equalTo:function(a,b,d){d=c(d).unbind(".validate-equalTo").bind("blur.validate-equalTo",function(){c(b).valid()});return a==d.val()}}});c.format=c.validator.format})(jQuery);
+(function(c){var a={};if(c.ajaxPrefilter)c.ajaxPrefilter(function(d,e,f){e=d.port;if(d.mode=="abort"){a[e]&&a[e].abort();a[e]=f}});else{var b=c.ajax;c.ajax=function(d){var e=("port"in d?d:c.ajaxSettings).port;if(("mode"in d?d:c.ajaxSettings).mode=="abort"){a[e]&&a[e].abort();return a[e]=b.apply(this,arguments)}return b.apply(this,arguments)}}})(jQuery);
+(function(c){!jQuery.event.special.focusin&&!jQuery.event.special.focusout&&document.addEventListener&&c.each({focus:"focusin",blur:"focusout"},function(a,b){function d(e){e=c.event.fix(e);e.type=b;return c.event.handle.call(this,e)}c.event.special[b]={setup:function(){this.addEventListener(a,d,true)},teardown:function(){this.removeEventListener(a,d,true)},handler:function(e){arguments[0]=c.event.fix(e);arguments[0].type=b;return c.event.handle.apply(this,arguments)}}});c.extend(c.fn,{validateDelegate:function(a,
+b,d){return this.bind(b,function(e){var f=c(e.target);if(f.is(a))return d.apply(f,arguments)})}})})(jQuery);
+
+
+/* Validate JS ends */
+
+var documentUrlVal=encodeURI(document.URL);
+
+	$(window).load(function(){
+ jQuery('.zoho-child-wrapper li a').each(function() {
+         if (/\/assist\/help\//.test(documentUrlVal) ){
+                 jQuery('.zoho-parent-toggle').remove();  
+        }
+        if (/\/mail\/help\//.test(documentUrlVal) || jQuery(this).hasClass('active')) {
+if( !(/\/mail\/help\/api\//.test(documentUrlVal))){
+            jQuery(this).parent().parent().parent().addClass('open');
+        }
+}
+    });
+    jQuery('.zoho-child-wrapper').each(function() {
+        if (/\/mail\/help\//.test(documentUrlVal) || jQuery(this).parent().hasClass('open')) {
+if( !(/\/mail\/help\/api\//.test(documentUrlVal))){
+            jQuery(this).css("display", "block");
+}
+        }
+    });
+var feedbackform='<div class="yes-msg">Thank you for your feedback.</div><div class="success-mesg">Thank you for your feedback.</div><div class="help-docs-feedback-form" style=""><form action="https://creator.zoho.com/addRecordValidate.do" method="POST" id="zfeedback" novalidate="novalidate"><fieldset class="form-row textarea-container"><label>Please tell us how we can make this article better</label><textarea name="Please_tell_us_how_we_can_make_this_article_better"></textarea></fieldset><fieldset class="form-row input-container"><label>Your Email Address</label><input name="Email"></fieldset><input name="sharedBy" value="zohomailsuite" type="hidden"><input name="formid" value="779027000008051005" type="hidden"><input value="true" name="scriptembed" type="hidden"><input name="nexturl" id="feedback_nexturl" value="'+documentUrlVal+'" type="hidden"><input name="Ref_Url" id="feedback_ref_url" value="'+documentUrlVal+'" type="hidden"><input name="privatelink" value="T3bn5EkBXaFfJA99y8aPsXhv69Tr8By0J6DBjQvYbuTYf08kb6KEvRTe9O3NEFnJkaCrm1E1nyFQ3mA8SA2WvnsVzJyh8VRP47Zb" type="hidden"><fieldset class="form-row submit-wrap"><input value="Submit" class="zbtn" type="submit"></fieldset></form></div>';
+$(feedbackform).appendTo('.helpful-wrap .feedback');
+
+
+$('.feedback .dislike-this > a').click(function(){
+	if($(this).css('opacity')!=0.3){
+		$('.help-docs-feedback-form').slideDown(300);
+	}
+});
+$('.feedback .like-this > a').click(function(){
+	if($(this).css('opacity')!=0.3){
+		$('.help-docs-feedback-form').slideUp(300,function(){
+			$('.helpful-wrap > div.feedback span a').css('opacity',0.3);
+			$('.yes-msg').slideDown(300);
+		});
+	}
+
+});
+jQuery(function() {
+					jQuery("#zfeedback").validate({
+				  		rules: {
+		              		Please_tell_us_how_we_can_make_this_article_better: "required"
+	            		},
+		            	messages: {
+		              		Please_tell_us_how_we_can_make_this_article_better: "Give us your valuable feedback"
+		            	},
+						onsubmit : function() {
+
+						},
+		            	submitHandler: function(form) {
+							$('.helpful-wrap > div.feedback span a').css('opacity',0.3);
+							$('.feedback .help-docs-feedback-form').slideUp(300,function(){  
+							
+							$('.feedback .success-mesg').slideDown(200);
+								setTimeout(function() {
+									form.submit();
+								},1500);
+							
+							});
+							
+		            	},
+						errorPlacement: function (error, element) {error.insertAfter($(element).after());}
+	          		});
+        	});
+
+});
+/*jQuery(document).ready(function(){
+if(  (/\/adminconsole\/print\//.test(documentUrlVal)) ){
+jQuery(".banner-wrap").css("display","none");
+jQuery(".help-menu-panel").css("display","none");
+}
+});*/
+jQuery(document).ready(function(){
+	jQuery('.node-type-product-help-2-0-content-section .feedback .like-this .thickbox').attr('onclick',"zcTrackClick('yes-button-click','help-pages','mail')")
+});
+
+
+/************** Help Print page margin top set starts****************/
+$(document).ready(function(){
+	var documentUrl = window.location.pathname;
+    var productNamee = documentUrl.split("/");
+	
+	if(productNamee[1] == "mail" && productNamee[2] == "help" && productNamee[3] == "adminconsole" && productNamee[4] == "print") {
+		$("#block-system-main").css({"margin-top": "0px"});
+                $(".banner-wrap").css("display","none");
+$(".help-menu-panel").css("display","none");
+	}
+});
+/************** Help Print page margin top set ends****************/
+
+$(window).load(function() {
+    if ($('.main-container-wrapper').hasClass('umain')) {
+        $('.cta-btn').attr('href', 'https://mail.zoho.com/').html(accessZohomail);
+        $('.cta-btn').addClass('logged-in');
+    }
+});
+
+/*TEXT CHANGE AFTER LOGIN*/
+
+
+$('.move-top').on('click', function(e) {
+    if ($(this).hasClass('logged-in') || $(window).width() < 992) {
+        return true;
+    } else {
+        e.preventDefault();
+        $('html, body').animate({
+            scrollTop: 0
+        }, 800);
+        $("input[name='r_account.account_name']").focus();
+    }
+});
+
+$(window).ready(function(e) {
+    $('<img src="/sites/default/files/mail-home-wave.svg" id="zwave-banner">').prependTo($('.zp-home-banner-wrap .promo-sec-wrap'));
+});
+
+
+
+/**signup functions start**/
+var zohoDomain = document.domain,
+    mobileValidate, euCom = '.com';
+jQuery(window).load(function(event) {
+    event.preventDefault()
+});
+
+function z_add_account_script() {
+    var getDomain = document.domain
+    var splitUrl = getDomain.split('.');
+    var domainOne = splitUrl.pop();
+    var domain = splitUrl.pop();
+    if (zohoDomain.indexOf('.zoho' + euCom) > -1)
+        mobileOnly = "&mobile_only=true";
+    else
+        mobileOnly = '';
+    var script = document.createElement('script');
+    script.src = "https://accounts." + domain + ".com/accounts/register.js?service_language="+currentLang+"&servicename=VirtualOffice" + mobileOnly + "&loadcss=false&serviceurl=/";
+    document.getElementsByTagName('head')[0].appendChild(script);
+}
+
+var isDomainValid = true;
+var nameExp = /^[A-Za-z0-9_\-\ \.]+$/;
+var mobExp = /^[+\-\d\s\(\)]+$/;
+var imageUrl = "https\x3A\x2F\x2Flocalcss.zohostatic.com\x2Fzmail\x2Fv333\x2Fbiz/img/";
+var conPath = "\x2Fbiz";
+
+afterSignUpPageLoaded = function() {
+    if ($a("confirm_country_code")) {
+        if (typeof ZACountryCodeDetails === "string") { //No I18N
+            ZACountryCodeDetails = JSON.parse(ZACountryCodeDetails.replace(/'/g, "\""));
+        }
+        var option = document.createDocumentFragment();
+        $.each(ZACountryCodeDetails, function(index, data) {
+            var opt2 = document.createElement("option"); //No I18N
+            opt2.value = data.country_code;
+            $(opt2).text(data.country_name + " (+" + data.dialling_code + ")");
+
+            if (ZADefaultCountry == data.country_code) {
+                opt2.setAttribute("selected", "selected");
+                $a("ccodediv").innerHTML = "+" + data.dialling_code;
+                $a("cccodediv").innerHTML = "+" + data.dialling_code;
+            }
+            option.appendChild(opt2);
+        });
+
+        $a("country_code").innerHTML = "";
+        $a("country_code").appendChild(option);
+        var $options = $("#country_code > option").clone();
+        $('#confirm_country_code').append($options);
+        if ($a("ccodediv").innerHTML == '' || $a("ccodediv").innerHTML == '&nbsp;') {
+            var intData = ZACountryCodeDetails[getCountryIndex($a("country_code").value)];
+            $a("ccodediv").innerHTML = "+" + intData.dialling_code;
+            $a("cccodediv").innerHTML = "+" + intData.dialling_code;
+        }
+    }
+}
+
+
+getCountryIndex = function(countryCode) {
+    for (var index in ZACountryCodeDetails) {
+        if (ZACountryCodeDetails[index].country_code == countryCode) {
+            return index;
+        }
+    }
+}
+
+
+changeCountrycode = function(countryCode, obj) {
+    var intData = ZACountryCodeDetails[getCountryIndex(countryCode)];
+    obj.innerHTML = "+" + intData.dialling_code
+    if (obj.id == 'ccodediv') {
+        if ($a('mobile').value != '') {
+            $('#mobile').removeData("previousValue");
+            $('#mobile').valid();
+        }
+    } else {
+        if ($a('confirmMobile').value != '') {
+            $('#confirmMobile').removeData("previousValue");
+            $('#confirmMobile').valid();
+        }
+    }
+}
+
+
+displayDiv = function(divId) {
+    if (divId) {
+        divId.style.display = "";
+        var aTop = ($(document).height() - divId.offsetHeight) / 2;
+        var aLeft = ($(document).width() - divId.offsetWidth) / 2;
+        divId.style.top = aTop + "px";
+        divId.style.left = aLeft + "px";
+        divId.style.display = "";
+    }
+}
+
+
+closeDiv = function(obj) {
+    if (obj) {
+        obj.style.display = "none";
+    }
+}
+
+
+$a = function(id) {
+    return document.getElementById(id);
+}
+
+if (document.getElementById("defdomdiv")) {
+    document.getElementById('username').setAttribute("style", "width:" + (304 - (document.getElementById("defdomdiv").clientWidth + 1)) + "px !important;");
+}
+
+
+
+function addEvents() {
+    $("input").not('#tos').on("click focus", function(e) { //No i18n
+        $("input").parent().children("p").hide(); //No i18n
+        $(this).parent().children("p").show(); //No i18n
+        e.stopPropagation();
+    }).blur(function(e) {
+        $(this).parent().children("p").hide(); //No i18n
+        e.stopPropagation();
+    });
+
+    if ($a("confirmMobile")) {
+        $('#confirmMobile').unbind('copy paste').bind('copy paste', function(e) {
+            e.preventDefault();
+        });
+    }
+    if ($a("mobile")) {
+        $('#mobile').unbind('copy paste').bind('copy paste', function(e) {
+            e.preventDefault();
+        });
+    }
+
+    $(document).click(function() {
+        $(".zmSignup li div p").hide();
+    });
+    $(".refresh").click(function() {
+        reloadCaptcha(document.zmailSignup)
+    });
+}
+
+function validateEmail(val) {
+    if (!(/[a-zA-Z0-9]/).test(val[0])) { //No i18n
+        return "Username part should start with an alpha numeric (a-z ,0-9) character";
+    } else if (!(/[a-zA-Z0-9]/).test(val[val.length - 1])) { //No i18n
+        return "Username part should end with an alpha numeric (a-z ,0-9) character";
+    } else if (!isNaN(val)) { //No i18n
+        return "Username part should contain atleast one alphabet";
+    } else if (!(/^([a-zA-Z0-9]+[_\.a-zA-Z0-9]*)$/.test(val))) { //No i18n
+        return "Only letters, numbers, underscores (_), dots (.) are allowed";
+    } else if (val.length < 2 || val.length > 30) { //No i18n
+        return "Username part should be from 2 to 30 characters";
+    }
+}
+
+function validateName(val) {
+    if (!nameExp.test(val)) { //No i18n
+        return "Only letters, numbers, underscores (_), dots (.) are allowed";
+    }
+}
+
+function validateDomain(val) {
+    if (val.match("'") || val.match("\"")) {
+        return "Domain name cannot contain quotes";
+    } else if (!val.match(domainExp)) {
+        return "Invalid domain name specified";
+    }
+}
+
+function validateMobile(val) {
+    if (!mobExp.test(val)) {
+        return "Please enter a valid Mobile Number";
+    }
+}
+
+function validateConfirmMobile(val) {
+    if ($a("mobile").value != val || $a("country_code").value != $a("confirm_country_code").value) {
+        return numberMatchTranslt;
+    }
+}
+
+function showhidepass() {
+    var $input = $("#password");
+    var change = "text";
+    var title = "Hide Password";
+    if ($input.attr('type') == "text") {
+        change = "password";
+        title = "Show Password";
+    }
+    var rep = $("<input type='" + change + "' />")
+        .attr("id", $input.attr("id"))
+        .attr("name", $input.attr("name"))
+        .attr('class', $input.attr('class'))
+        .attr('tabindex', $input.attr('tabindex'))
+        .val($input.val())
+        .insertBefore($input);
+    $('#eyeimg').attr('title', title);
+    $input.remove();
+}
+
+/*function zohoGASignupEvent() {
+    // This method will be overrided by GTM for GA tracker.
+}*/
+
+function onSignupReady() {
+    var signupbtn = $('#signupbtn');
+    var continuebtn = $('#continuebtn');
+    $("#signupbtn, #continuebtn, .za-tos-container").removeClass('disabled-z-signup');
+	$('.za-tos').removeAttr('disabled');
+    signupbtn.css({
+        'opacity': 1
+    })
+    continuebtn.css({
+        'opacity': 1
+    })
+
+    $(document.body).css("overflow", "visible");
+    addEvents();
+    $.validator.addMethod("isValid", function(val, element) { // No I18N
+        if (element.name == "x_sec_name") {
+            if (!(/[a-zA-Z0-9]/).test(val[0])) { //No i18n
+                return false; //No i18n
+            } else if (!(/[a-zA-Z0-9]/).test(val[val.length - 1])) { //No i18n
+                return false; //No i18n
+            } else if (!isNaN(val)) { //No i18n
+                return false; //No i18n
+            } else if (!(/^([a-zA-Z0-9]+[_\.a-zA-Z0-9]*)$/.test(val))) { //No i18n
+                return false; //No i18n
+            } else if (val.length < 1 || val.length > 30) { //No i18n
+                return false; //No i18n
+            }
+        }
+        if (element.name == "firstname") {
+            if (!nameExp.test(val)) { //No i18n
+                return false;
+            }
+        }
+        if (element.name == "lastname") {
+            if (!nameExp.test(val)) { //No i18n
+                return false;
+            }
+        }
+        if (element.name == "x_pri_domain") {
+            if (val.match("'") || val.match("\"") || !val.match(domainExp)) {
+                return false;
+            } else {
+                if (val.trim() !== "") {
+                    chosenDomainName = val.trim();
+                    if (chosenDomainName.indexOf("www.") == 0) {
+                        $a("dmnname").value = chosenDomainName.substring(chosenDomainName.indexOf("www.") + 4);
+                        chosenDomainName = chosenDomainName.substring(chosenDomainName.indexOf("www.") + 4);
+                    }
+                    $a("x_sec_domain").value = '@' + chosenDomainName;
+                    $("#domainSpan").text('@' + chosenDomainName);
+                }
+            }
+        }
+
+        if (element.name == "confirmMobile") {
+            if ($a("mobile").value != val || $a("country_code").value != $a("confirm_country_code").value) {
+                return false;
+            }
+        }
+
+        return true; //No i18n
+    });
+
+
+    if (zohoDomain.indexOf('.zoho' + euCom) > -1)
+        mobileValidate = true;
+    else
+        mobileValidate = false;
+
+
+    $("#zmailSignup").zaSignUp({
+        x_signup: {
+            password_required: true,
+            username_required: true, // Username field  
+            confirmMobile_required: mobileValidate, //NO I18N   
+            firstname_required: true,
+            lastname_required: true
+        },
+        validator: {
+            rules: {
+                "x_sec_name": {
+                    required: true,
+                    isValid: true,
+                    validateRemote: true
+                },
+                "x_sec_domain": {
+                    required: true,
+                    isValid: true,
+                    validateRemote: true
+                },
+                "firstname": {
+                    required: true,
+                    isValid: true,
+                    validateRemote: true
+                },
+                "lastname": {
+                    required: true,
+                    isValid: true,
+                    validateRemote: true
+                },
+                "confirmMobile": {
+                    required: mobileValidate,
+                    isValid: mobileValidate,
+                    validateRemote: false
+                }
+
+            },
+            messages: {
+                "x_sec_name": { //No i18n
+                    required: userNameTranslt,
+                    isValid: function() {
+                        return validateEmail(document.zmailSignup.x_sec_name.value);
+                    }
+                },
+                "firstname": {
+                    required: firstNameTranslt,
+                    isValid: function() {
+                        return validateName(document.zmailSignup.firstname.value);
+                    }
+                },
+                "lastname": {
+                    required: lastNameTranslt,
+                    isValid: function() {
+                        return validateName(document.zmailSignup.lastname.value);
+                    }
+                },
+                "confirmMobile": {
+                    required: mobileNumberTranslt,
+                    isValid: function() {
+                        return validateConfirmMobile(document.zmailSignup.confirmMobile.value);
+                    }
+                }
+
+
+            }
+        },
+        onsubmit: function() {
+            signupbtn.val(creatingthePortal); //No i18n
+            zohoGASignupEvent();
+        },
+        oncomplete: function(state) {
+            if (state == $.fn.zaSignUp.SIGNUP_STATE.ERROR) {
+                $("#zmailSignup").show();
+                $("#succMsg").hide();
+            } else if (state == $.fn.zaSignUp.SIGNUP_STATE.SIGNUP_COMPLETED) {
+                try {
+                    $zoho.livedesk.visitor.customaction("Signed Up");
+                } catch (exp) {}
+            }
+        },
+        handleConfirmation: function(data) {
+
+            data.doAction();
+
+        }
+
+    });
+
+
+    $("#zmailSignup input:first").focus();
+
+    afterSignUpPageLoaded();
+}
+
+      var signupforFree = Drupal.t('Sign Up for Free');
+      var accessZohomail = Drupal.t('Access Zoho')+" Mail";
+      var creatingthePortal = Drupal.t("Creating Your Account...");
+      var userNameTranslt = Drupal.t('Please enter the Username part');
+      var firstNameTranslt = Drupal.t('Please enter the First name');
+      var lastNameTranslt = Drupal.t('Please enter the Last name');
+      var mobileNumberTranslt = Drupal.t('Re-enter your Mobile Number');
+      var numberMatchTranslt = Drupal.t('Your Confirm Mobile Number does not match with your Mobile Number');
+
+$(document).ready(function(e) {
+
+    if ($('#czone-home').length) {
+        var signupForm = '<div class="get-signup-plan"> <input checked="" id="business" name="x_accountType" value="2" type="radio"> <label for="business">'+ Drupal.t("Business Email")+'</label> <input id="personal" name="x_accountType" value="1" type="radio"> <label for="personal">'+ Drupal.t("Personal Email")+'</label> </div><div class="business-email"><p>'+ Drupal.t("Zoho Mail is now offered as a part of Zoho Workplace, an integrated suite of nine applications including Zoho Docs, Connect and Office Suite.")+'</p><div class="sgnbtn continuebtn"><a href="'+langsrc+'workplace/pricing.html?src=zmail" target="_blank" class="act-btn cta-btn zwp-pricing-link">'+ Drupal.t("SIGN UP NOW")+'</a></div></div><form action="//accounts.zoho.com/accounts/register.ac" autocomplete="off" class="banner-signup personal-email" id="zmailSignup" method="post" name="zmailSignup" novalidate><div class="za-username-container sgfrm " id="usernmediv" style="clear: both;"><input class="sgnemail" id="username" name="username" placeholder="'+Drupal.t("Email id you wish to have")+'" style="padding-right: 85px;" tabindex="1" type="text"/><label class="defdomlabel" id="defdomdiv">@zoho.com</label></div><div class="za-password-container sgfrm" id="passworddiv" style="position: relative;"><input class="sgnemail" id="password" name="password" tabindex="2" type="password" placeholder="'+Drupal.t("Password")+'"/><div class="password-strength"><div>&nbsp;</div></div></div><div class="two-col-input"><div class="za-name-container sgfrm"><input class="name sgnemail" id="sfirstname" maxlength="30" placeholder="'+Drupal.t("First Name")+'" name="firstname" tabindex="3" type="text"/></div><div class="za-name-container sgfrm"><input class="name sgnemail" id="lastname" maxlength="30" placeholder="'+Drupal.t("Last Name")+'" name="lastname" tabindex="4" type="text"/></div></div><div class="za-email-container sgfrm"><div align="left"><input class="sgnemail" id="email" name="email" placeholder="'+Drupal.t("Contact Email")+'" tabindex="5" type="text"/></div></div><div class="za-emailormobile-container" id="emailormobileDiv" style="display:none;"><label for="#emailormobile">Email or Mobile phone</label><div align="left"><input disabled="disabled" id="emailormobile" name="emailormobile" spellcheck="false" tabindex="6" type="text"/></div></div><div class="za-mobile-container sgfrm"><div align="left" class="za-country_code-container "><select class="za_country_code" id="country_code" name="country_code" onchange="changeCountrycode(this.value,$a(\'ccodediv\'))"></select><div class="ccodelabel" id="countryCodeDiv"><div class="ccodediv" id="ccodediv">&nbsp;</div><div class="ccodelabelimg">&nbsp;</div></div><input id="mobile" name="mobile" placeholder="'+Drupal.t("Mobile phone")+'" spellcheck="false" tabindex="6" type="text"/></div></div><div class="za-remobile-container sgfrm"><div align="left" class="za-ccountry_code-container"><select id="confirm_country_code" name="confirm_country_code" onchange="changeCountrycode(this.value,$a(\'cccodediv\'))"></select><div class="ccodelabel" id="countryconfirmCodeDiv"><div class="cccodediv" id="cccodediv">&nbsp;</div><div class="ccodelabelimg">&nbsp;</div></div><input id="confirmMobile" name="confirmMobile" placeholder="'+Drupal.t("Re-enter your Mobile phone")+'" spellcheck="false" tabindex="6" type="text"/></div></div><div class="za-captcha-container captcha sgfrm" style="display:none"><input class="cap sgnemail" disabled="disabled" id="captcha" name="captcha" placeholder="Word Verification" tabindex="6" type="text"/><img class="refresh" src="https://css.zohostatic.com/zmail/v316/biz/img/refresh.png"/><em class="captcha"><img class="za-captcha"/></em></div><div class="sgnbtnmn"><div class="za-newsletter-container snews-letter"><input class="za-newsletter" name="newsletter" type="checkbox" value="true"/>'+Drupal.t("Subscribe to Zoho Newsletter")+'</div><div class="za-tos-container disabled-z-signup" onclick="return zSignupPrevent();"><label class="sign_agree" for="tos"><span class="unchecked" id="signup-termservice"></span>'+Drupal.t("I agree to the ")+'<a href="'+langsrc+'terms.html" target="_blank"> '+Drupal.t("Terms of Service")+'</a> '+Drupal.t("and")+' <a class="zrlink" href="'+langsrc+'privacy.html" target="_blank">'+Drupal.t("Privacy Policy")+'</a>.<input class="za-tos" disabled="disabled" id="tos" name="tos" onclick="toggleTosField()" tabindex="1" type="checkbox" value="false"/></label></div><div class="sgnbtn"><input class="signupbtn disabled-z-signup" id="signupbtn" onclick=" return zSignupPrevent();" tabindex="7" type="submit" value="'+signupforFree+'"/></div></div></form><div class="socl-signup"><p>'+Drupal.t("or sign in using")+' <span class="vi-google" onclick="FederatedSignIn.GO(\'g\');zohoFedClickEvent(\'Google\');" title="Google">Google</span><span class="vi-facebook" onclick="FederatedSignIn.GO(\'f\');zohoFedClickEvent(\'Facebook\');" title="Facebook">Facebook</span><span class="vi-twitter" onclick="FederatedSignIn.GO(\'t\');zohoFedClickEvent(\'Twitter\');" title="Twitter">Twitter</span><span class="vi-linkedin" onclick="FederatedSignIn.GO(\'l\');zohoFedClickEvent(\'Linkedin\');" title="Linkedin">Linkedin</span></p></div>';
+        $('#czone-home').append(signupForm);
+        z_add_account_script();
+    }
+
+    if (window.location.href.indexOf('.eu') > -1) {
+        $(".za-email-container.za-contactmail-container.sgfrm").addClass("eu-region");
+        $(".za-mobile-container.sgfrm").addClass("eu-region");
+        $(".za-remobile-container.sgfrm").addClass("eu-region");
+        $(".za-remobile-container").hide();
+    }
+
+    $('.get-signup-plan input').on('click', function() {
+        if ($(".field-msg").length) {
+            $(".field-msg").remove();
+        }
+        if ($(this).attr('id') == 'business') {
+            $(".personal-email").hide();
+            $(".business-email").show();
+            $('.socl-signup').hide();
+        } else {
+            $(".personal-email").show();
+            $('.socl-signup').show();
+            $(".business-email").hide();
+        }
+    });
+});
+/**signup functions end**/

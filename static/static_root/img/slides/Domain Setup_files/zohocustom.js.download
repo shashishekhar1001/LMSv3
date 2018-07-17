@@ -1,0 +1,3006 @@
+/* Validate JS */
+
+/**
+ * jQuery Validation Plugin 1.9.0
+ **/
+ 
+ 
+(function(c){c.extend(c.fn,{validate:function(a){if(this.length){var b=c.data(this[0],"validator");if(b)return b;this.attr("novalidate","novalidate");b=new c.validator(a,this[0]);c.data(this[0],"validator",b);if(b.settings.onsubmit){a=this.find("input, button");a.filter(".cancel").click(function(){b.cancelSubmit=true});b.settings.submitHandler&&a.filter(":submit").click(function(){b.submitButton=this});this.submit(function(d){function e(){if(b.settings.submitHandler){if(b.submitButton)var f=c("<input type='hidden'/>").attr("name",
+b.submitButton.name).val(b.submitButton.value).appendTo(b.currentForm);b.settings.submitHandler.call(b,b.currentForm);b.submitButton&&f.remove();return false}return true}b.settings.debug&&d.preventDefault();if(b.cancelSubmit){b.cancelSubmit=false;return e()}if(b.form()){if(b.pendingRequest){b.formSubmitted=true;return false}return e()}else{b.focusInvalid();return false}})}return b}else a&&a.debug&&window.console&&console.warn("nothing selected, can't validate, returning nothing")},valid:function(){if(c(this[0]).is("form"))return this.validate().form();
+else{var a=true,b=c(this[0].form).validate();this.each(function(){a&=b.element(this)});return a}},removeAttrs:function(a){var b={},d=this;c.each(a.split(/\s/),function(e,f){b[f]=d.attr(f);d.removeAttr(f)});return b},rules:function(a,b){var d=this[0];if(a){var e=c.data(d.form,"validator").settings,f=e.rules,g=c.validator.staticRules(d);switch(a){case "add":c.extend(g,c.validator.normalizeRule(b));f[d.name]=g;if(b.messages)e.messages[d.name]=c.extend(e.messages[d.name],b.messages);break;case "remove":if(!b){delete f[d.name];
+return g}var h={};c.each(b.split(/\s/),function(j,i){h[i]=g[i];delete g[i]});return h}}d=c.validator.normalizeRules(c.extend({},c.validator.metadataRules(d),c.validator.classRules(d),c.validator.attributeRules(d),c.validator.staticRules(d)),d);if(d.required){e=d.required;delete d.required;d=c.extend({required:e},d)}return d}});c.extend(c.expr[":"],{blank:function(a){return!c.trim(""+a.value)},filled:function(a){return!!c.trim(""+a.value)},unchecked:function(a){return!a.checked}});c.validator=function(a,
+b){this.settings=c.extend(true,{},c.validator.defaults,a);this.currentForm=b;this.init()};c.validator.format=function(a,b){if(arguments.length==1)return function(){var d=c.makeArray(arguments);d.unshift(a);return c.validator.format.apply(this,d)};if(arguments.length>2&&b.constructor!=Array)b=c.makeArray(arguments).slice(1);if(b.constructor!=Array)b=[b];c.each(b,function(d,e){a=a.replace(RegExp("\\{"+d+"\\}","g"),e)});return a};c.extend(c.validator,{defaults:{messages:{},groups:{},rules:{},errorClass:"error",
+validClass:"valid",errorElement:"label",focusInvalid:true,errorContainer:c([]),errorLabelContainer:c([]),onsubmit:true,ignore:":hidden",ignoreTitle:false,onfocusin:function(a){this.lastActive=a;if(this.settings.focusCleanup&&!this.blockFocusCleanup){this.settings.unhighlight&&this.settings.unhighlight.call(this,a,this.settings.errorClass,this.settings.validClass);this.addWrapper(this.errorsFor(a)).hide()}},onfocusout:function(a){if(!this.checkable(a)&&(a.name in this.submitted||!this.optional(a)))this.element(a)},
+onkeyup:function(a){if(a.name in this.submitted||a==this.lastElement)this.element(a)},onclick:function(a){if(a.name in this.submitted)this.element(a);else a.parentNode.name in this.submitted&&this.element(a.parentNode)},highlight:function(a,b,d){a.type==="radio"?this.findByName(a.name).addClass(b).removeClass(d):c(a).addClass(b).removeClass(d)},unhighlight:function(a,b,d){a.type==="radio"?this.findByName(a.name).removeClass(b).addClass(d):c(a).removeClass(b).addClass(d)}},setDefaults:function(a){c.extend(c.validator.defaults,
+a)},messages:{required:"This field is required.",remote:"Please fix this field.",email:"Please enter a valid email address.",url:"Please enter a valid URL.",date:"Please enter a valid date.",dateISO:"Please enter a valid date (ISO).",number:"Please enter a valid number.",digits:"Please enter only digits.",creditcard:"Please enter a valid credit card number.",equalTo:"Please enter the same value again.",accept:"Please enter a value with a valid extension.",maxlength:c.validator.format("Please enter no more than {0} characters."),
+minlength:c.validator.format("Please enter at least {0} characters."),rangelength:c.validator.format("Please enter a value between {0} and {1} characters long."),range:c.validator.format("Please enter a value between {0} and {1}."),max:c.validator.format("Please enter a value less than or equal to {0}."),min:c.validator.format("Please enter a value greater than or equal to {0}.")},autoCreateRanges:false,prototype:{init:function(){function a(e){var f=c.data(this[0].form,"validator"),g="on"+e.type.replace(/^validate/,
+"");f.settings[g]&&f.settings[g].call(f,this[0],e)}this.labelContainer=c(this.settings.errorLabelContainer);this.errorContext=this.labelContainer.length&&this.labelContainer||c(this.currentForm);this.containers=c(this.settings.errorContainer).add(this.settings.errorLabelContainer);this.submitted={};this.valueCache={};this.pendingRequest=0;this.pending={};this.invalid={};this.reset();var b=this.groups={};c.each(this.settings.groups,function(e,f){c.each(f.split(/\s/),function(g,h){b[h]=e})});var d=
+this.settings.rules;c.each(d,function(e,f){d[e]=c.validator.normalizeRule(f)});c(this.currentForm).validateDelegate("[type='text'], [type='password'], [type='file'], select, textarea, [type='number'], [type='search'] ,[type='tel'], [type='url'], [type='email'], [type='datetime'], [type='date'], [type='month'], [type='week'], [type='time'], [type='datetime-local'], [type='range'], [type='color'] ","focusin focusout keyup",a).validateDelegate("[type='radio'], [type='checkbox'], select, option","click",
+a);this.settings.invalidHandler&&c(this.currentForm).bind("invalid-form.validate",this.settings.invalidHandler)},form:function(){this.checkForm();c.extend(this.submitted,this.errorMap);this.invalid=c.extend({},this.errorMap);this.valid()||c(this.currentForm).triggerHandler("invalid-form",[this]);this.showErrors();return this.valid()},checkForm:function(){this.prepareForm();for(var a=0,b=this.currentElements=this.elements();b[a];a++)this.check(b[a]);return this.valid()},element:function(a){this.lastElement=
+a=this.validationTargetFor(this.clean(a));this.prepareElement(a);this.currentElements=c(a);var b=this.check(a);if(b)delete this.invalid[a.name];else this.invalid[a.name]=true;if(!this.numberOfInvalids())this.toHide=this.toHide.add(this.containers);this.showErrors();return b},showErrors:function(a){if(a){c.extend(this.errorMap,a);this.errorList=[];for(var b in a)this.errorList.push({message:a[b],element:this.findByName(b)[0]});this.successList=c.grep(this.successList,function(d){return!(d.name in a)})}this.settings.showErrors?
+this.settings.showErrors.call(this,this.errorMap,this.errorList):this.defaultShowErrors()},resetForm:function(){c.fn.resetForm&&c(this.currentForm).resetForm();this.submitted={};this.lastElement=null;this.prepareForm();this.hideErrors();this.elements().removeClass(this.settings.errorClass)},numberOfInvalids:function(){return this.objectLength(this.invalid)},objectLength:function(a){var b=0,d;for(d in a)b++;return b},hideErrors:function(){this.addWrapper(this.toHide).hide()},valid:function(){return this.size()==
+0},size:function(){return this.errorList.length},focusInvalid:function(){if(this.settings.focusInvalid)try{c(this.findLastActive()||this.errorList.length&&this.errorList[0].element||[]).filter(":visible").focus().trigger("focusin")}catch(a){}},findLastActive:function(){var a=this.lastActive;return a&&c.grep(this.errorList,function(b){return b.element.name==a.name}).length==1&&a},elements:function(){var a=this,b={};return c(this.currentForm).find("input, select, textarea").not(":submit, :reset, :image, [disabled]").not(this.settings.ignore).filter(function(){!this.name&&
+a.settings.debug&&window.console&&console.error("%o has no name assigned",this);if(this.name in b||!a.objectLength(c(this).rules()))return false;return b[this.name]=true})},clean:function(a){return c(a)[0]},errors:function(){return c(this.settings.errorElement+"."+this.settings.errorClass,this.errorContext)},reset:function(){this.successList=[];this.errorList=[];this.errorMap={};this.toShow=c([]);this.toHide=c([]);this.currentElements=c([])},prepareForm:function(){this.reset();this.toHide=this.errors().add(this.containers)},
+prepareElement:function(a){this.reset();this.toHide=this.errorsFor(a)},check:function(a){a=this.validationTargetFor(this.clean(a));var b=c(a).rules(),d=false,e;for(e in b){var f={method:e,parameters:b[e]};try{var g=c.validator.methods[e].call(this,a.value.replace(/\r/g,""),a,f.parameters);if(g=="dependency-mismatch")d=true;else{d=false;if(g=="pending"){this.toHide=this.toHide.not(this.errorsFor(a));return}if(!g){this.formatAndAdd(a,f);return false}}}catch(h){this.settings.debug&&window.console&&console.log("exception occured when checking element "+
+a.id+", check the '"+f.method+"' method",h);throw h;}}if(!d){this.objectLength(b)&&this.successList.push(a);return true}},customMetaMessage:function(a,b){if(c.metadata){var d=this.settings.meta?c(a).metadata()[this.settings.meta]:c(a).metadata();return d&&d.messages&&d.messages[b]}},customMessage:function(a,b){var d=this.settings.messages[a];return d&&(d.constructor==String?d:d[b])},findDefined:function(){for(var a=0;a<arguments.length;a++)if(arguments[a]!==undefined)return arguments[a]},defaultMessage:function(a,
+b){return this.findDefined(this.customMessage(a.name,b),this.customMetaMessage(a,b),!this.settings.ignoreTitle&&a.title||undefined,c.validator.messages[b],"<strong>Warning: No message defined for "+a.name+"</strong>")},formatAndAdd:function(a,b){var d=this.defaultMessage(a,b.method),e=/\$?\{(\d+)\}/g;if(typeof d=="function")d=d.call(this,b.parameters,a);else if(e.test(d))d=jQuery.format(d.replace(e,"{$1}"),b.parameters);this.errorList.push({message:d,element:a});this.errorMap[a.name]=d;this.submitted[a.name]=
+d},addWrapper:function(a){if(this.settings.wrapper)a=a.add(a.parent(this.settings.wrapper));return a},defaultShowErrors:function(){for(var a=0;this.errorList[a];a++){var b=this.errorList[a];this.settings.highlight&&this.settings.highlight.call(this,b.element,this.settings.errorClass,this.settings.validClass);this.showLabel(b.element,b.message)}if(this.errorList.length)this.toShow=this.toShow.add(this.containers);if(this.settings.success)for(a=0;this.successList[a];a++)this.showLabel(this.successList[a]);
+if(this.settings.unhighlight){a=0;for(b=this.validElements();b[a];a++)this.settings.unhighlight.call(this,b[a],this.settings.errorClass,this.settings.validClass)}this.toHide=this.toHide.not(this.toShow);this.hideErrors();this.addWrapper(this.toShow).show()},validElements:function(){return this.currentElements.not(this.invalidElements())},invalidElements:function(){return c(this.errorList).map(function(){return this.element})},showLabel:function(a,b){var d=this.errorsFor(a);if(d.length){d.removeClass(this.settings.validClass).addClass(this.settings.errorClass);
+d.attr("generated")&&d.html(b)}else{d=c("<"+this.settings.errorElement+"/>").attr({"for":this.idOrName(a),generated:true}).addClass(this.settings.errorClass).html(b||"");if(this.settings.wrapper)d=d.hide().show().wrap("<"+this.settings.wrapper+"/>").parent();this.labelContainer.append(d).length||(this.settings.errorPlacement?this.settings.errorPlacement(d,c(a)):d.insertAfter(a))}if(!b&&this.settings.success){d.text("");typeof this.settings.success=="string"?d.addClass(this.settings.success):this.settings.success(d)}this.toShow=
+this.toShow.add(d)},errorsFor:function(a){var b=this.idOrName(a);return this.errors().filter(function(){return c(this).attr("for")==b})},idOrName:function(a){return this.groups[a.name]||(this.checkable(a)?a.name:a.id||a.name)},validationTargetFor:function(a){if(this.checkable(a))a=this.findByName(a.name).not(this.settings.ignore)[0];return a},checkable:function(a){return/radio|checkbox/i.test(a.type)},findByName:function(a){var b=this.currentForm;return c(document.getElementsByName(a)).map(function(d,
+e){return e.form==b&&e.name==a&&e||null})},getLength:function(a,b){switch(b.nodeName.toLowerCase()){case "select":return c("option:selected",b).length;case "input":if(this.checkable(b))return this.findByName(b.name).filter(":checked").length}return a.length},depend:function(a,b){return this.dependTypes[typeof a]?this.dependTypes[typeof a](a,b):true},dependTypes:{"boolean":function(a){return a},string:function(a,b){return!!c(a,b.form).length},"function":function(a,b){return a(b)}},optional:function(a){return!c.validator.methods.required.call(this,
+c.trim(a.value),a)&&"dependency-mismatch"},startRequest:function(a){if(!this.pending[a.name]){this.pendingRequest++;this.pending[a.name]=true}},stopRequest:function(a,b){this.pendingRequest--;if(this.pendingRequest<0)this.pendingRequest=0;delete this.pending[a.name];if(b&&this.pendingRequest==0&&this.formSubmitted&&this.form()){c(this.currentForm).submit();this.formSubmitted=false}else if(!b&&this.pendingRequest==0&&this.formSubmitted){c(this.currentForm).triggerHandler("invalid-form",[this]);this.formSubmitted=
+false}},previousValue:function(a){return c.data(a,"previousValue")||c.data(a,"previousValue",{old:null,valid:true,message:this.defaultMessage(a,"remote")})}},classRuleSettings:{required:{required:true},email:{email:true},url:{url:true},date:{date:true},dateISO:{dateISO:true},dateDE:{dateDE:true},number:{number:true},numberDE:{numberDE:true},digits:{digits:true},creditcard:{creditcard:true}},addClassRules:function(a,b){a.constructor==String?this.classRuleSettings[a]=b:c.extend(this.classRuleSettings,
+a)},classRules:function(a){var b={};(a=c(a).attr("class"))&&c.each(a.split(" "),function(){this in c.validator.classRuleSettings&&c.extend(b,c.validator.classRuleSettings[this])});return b},attributeRules:function(a){var b={};a=c(a);for(var d in c.validator.methods){var e;if(e=d==="required"&&typeof c.fn.prop==="function"?a.prop(d):a.attr(d))b[d]=e;else if(a[0].getAttribute("type")===d)b[d]=true}b.maxlength&&/-1|2147483647|524288/.test(b.maxlength)&&delete b.maxlength;return b},metadataRules:function(a){if(!c.metadata)return{};
+var b=c.data(a.form,"validator").settings.meta;return b?c(a).metadata()[b]:c(a).metadata()},staticRules:function(a){var b={},d=c.data(a.form,"validator");if(d.settings.rules)b=c.validator.normalizeRule(d.settings.rules[a.name])||{};return b},normalizeRules:function(a,b){c.each(a,function(d,e){if(e===false)delete a[d];else if(e.param||e.depends){var f=true;switch(typeof e.depends){case "string":f=!!c(e.depends,b.form).length;break;case "function":f=e.depends.call(b,b)}if(f)a[d]=e.param!==undefined?
+e.param:true;else delete a[d]}});c.each(a,function(d,e){a[d]=c.isFunction(e)?e(b):e});c.each(["minlength","maxlength","min","max"],function(){if(a[this])a[this]=Number(a[this])});c.each(["rangelength","range"],function(){if(a[this])a[this]=[Number(a[this][0]),Number(a[this][1])]});if(c.validator.autoCreateRanges){if(a.min&&a.max){a.range=[a.min,a.max];delete a.min;delete a.max}if(a.minlength&&a.maxlength){a.rangelength=[a.minlength,a.maxlength];delete a.minlength;delete a.maxlength}}a.messages&&delete a.messages;
+return a},normalizeRule:function(a){if(typeof a=="string"){var b={};c.each(a.split(/\s/),function(){b[this]=true});a=b}return a},addMethod:function(a,b,d){c.validator.methods[a]=b;c.validator.messages[a]=d!=undefined?d:c.validator.messages[a];b.length<3&&c.validator.addClassRules(a,c.validator.normalizeRule(a))},methods:{required:function(a,b,d){if(!this.depend(d,b))return"dependency-mismatch";switch(b.nodeName.toLowerCase()){case "select":return(a=c(b).val())&&a.length>0;case "input":if(this.checkable(b))return this.getLength(a,
+b)>0;default:return c.trim(a).length>0}},remote:function(a,b,d){if(this.optional(b))return"dependency-mismatch";var e=this.previousValue(b);this.settings.messages[b.name]||(this.settings.messages[b.name]={});e.originalMessage=this.settings.messages[b.name].remote;this.settings.messages[b.name].remote=e.message;d=typeof d=="string"&&{url:d}||d;if(this.pending[b.name])return"pending";if(e.old===a)return e.valid;e.old=a;var f=this;this.startRequest(b);var g={};g[b.name]=a;c.ajax(c.extend(true,{url:d,
+mode:"abort",port:"validate"+b.name,dataType:"json",data:g,success:function(h){f.settings.messages[b.name].remote=e.originalMessage;var j=h===true;if(j){var i=f.formSubmitted;f.prepareElement(b);f.formSubmitted=i;f.successList.push(b);f.showErrors()}else{i={};h=h||f.defaultMessage(b,"remote");i[b.name]=e.message=c.isFunction(h)?h(a):h;f.showErrors(i)}e.valid=j;f.stopRequest(b,j)}},d));return"pending"},minlength:function(a,b,d){return this.optional(b)||this.getLength(c.trim(a),b)>=d},maxlength:function(a,
+b,d){return this.optional(b)||this.getLength(c.trim(a),b)<=d},rangelength:function(a,b,d){a=this.getLength(c.trim(a),b);return this.optional(b)||a>=d[0]&&a<=d[1]},min:function(a,b,d){return this.optional(b)||a>=d},max:function(a,b,d){return this.optional(b)||a<=d},range:function(a,b,d){return this.optional(b)||a>=d[0]&&a<=d[1]},email:function(a,b){return this.optional(b)||/^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i.test(a)},
+url:function(a,b){return this.optional(b)||/^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(a)},
+date:function(a,b){return this.optional(b)||!/Invalid|NaN/.test(new Date(a))},dateISO:function(a,b){return this.optional(b)||/^\d{4}[\/-]\d{1,2}[\/-]\d{1,2}$/.test(a)},number:function(a,b){return this.optional(b)||/^-?(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d+)?$/.test(a)},digits:function(a,b){return this.optional(b)||/^\d+$/.test(a)},creditcard:function(a,b){if(this.optional(b))return"dependency-mismatch";if(/[^0-9 -]+/.test(a))return false;var d=0,e=0,f=false;a=a.replace(/\D/g,"");for(var g=a.length-1;g>=
+0;g--){e=a.charAt(g);e=parseInt(e,10);if(f)if((e*=2)>9)e-=9;d+=e;f=!f}return d%10==0},accept:function(a,b,d){d=typeof d=="string"?d.replace(/,/g,"|"):"png|jpe?g|gif";return this.optional(b)||a.match(RegExp(".("+d+")$","i"))},equalTo:function(a,b,d){d=c(d).unbind(".validate-equalTo").bind("blur.validate-equalTo",function(){c(b).valid()});return a==d.val()}}});c.format=c.validator.format})(jQuery);
+(function(c){var a={};if(c.ajaxPrefilter)c.ajaxPrefilter(function(d,e,f){e=d.port;if(d.mode=="abort"){a[e]&&a[e].abort();a[e]=f}});else{var b=c.ajax;c.ajax=function(d){var e=("port"in d?d:c.ajaxSettings).port;if(("mode"in d?d:c.ajaxSettings).mode=="abort"){a[e]&&a[e].abort();return a[e]=b.apply(this,arguments)}return b.apply(this,arguments)}}})(jQuery);
+(function(c){!jQuery.event.special.focusin&&!jQuery.event.special.focusout&&document.addEventListener&&c.each({focus:"focusin",blur:"focusout"},function(a,b){function d(e){e=c.event.fix(e);e.type=b;return c.event.handle.call(this,e)}c.event.special[b]={setup:function(){this.addEventListener(a,d,true)},teardown:function(){this.removeEventListener(a,d,true)},handler:function(e){arguments[0]=c.event.fix(e);arguments[0].type=b;return c.event.handle.apply(this,arguments)}}});c.extend(c.fn,{validateDelegate:function(a,
+b,d){return this.bind(b,function(e){var f=c(e.target);if(f.is(a))return d.apply(f,arguments)})}})})(jQuery);
+
+
+/* Validate JS ends */
+
+(function ($) {
+
+Drupal.behaviors.initColorbox = {
+  attach: function (context, settings) {
+    if (!$.isFunction($.colorbox) || typeof settings.colorbox === 'undefined') {
+      return;
+    }
+
+    if (settings.colorbox.mobiledetect && window.matchMedia) {
+      // Disable Colorbox for small screens.
+      var mq = window.matchMedia("(max-device-width: " + settings.colorbox.mobiledevicewidth + ")");
+      if (mq.matches) {
+        return;
+      }
+    }
+
+    $('.colorbox', context)
+      .once('init-colorbox')
+      .colorbox(settings.colorbox);
+
+    $(context).bind('cbox_complete', function () {
+      Drupal.attachBehaviors('#cboxLoadedContent');
+    });
+  }
+};
+
+})(jQuery);
+;/**/
+(function ($) {
+
+Drupal.behaviors.initColorboxLoad = {
+  attach: function (context, settings) {
+    if (!$.isFunction($.colorbox) || typeof settings.colorbox === 'undefined') {
+      return;
+    }
+    $.urlParams = function (url) {
+      var p = {},
+          e,
+          a = /\+/g,  // Regex for replacing addition symbol with a space
+          r = /([^&=]+)=?([^&]*)/g,
+          d = function (s) { return decodeURIComponent(s.replace(a, ' ')); },
+          q = url.split('?');
+      while (e = r.exec(q[1])) {
+        e[1] = d(e[1]);
+        e[2] = d(e[2]);
+        switch (e[2].toLowerCase()) {
+          case 'true':
+          case 'yes':
+            e[2] = true;
+            break;
+          case 'false':
+          case 'no':
+            e[2] = false;
+            break;
+        }
+        if (e[1] == 'width') { e[1] = 'innerWidth'; }
+        if (e[1] == 'height') { e[1] = 'innerHeight'; }
+        p[e[1]] = e[2];
+      }
+      return p;
+    };
+    $('.colorbox-load', context)
+      .once('init-colorbox-load', function () {
+        var params = $.urlParams($(this).attr('href'));
+        $(this).colorbox($.extend({}, settings.colorbox, params));
+      });
+  }
+};
+
+})(jQuery);
+;/**/
+
+jQuery(document).ready( function() {
+	jQuery("#loader").delay(3000).fadeOut("slow");
+});/**/
+/*!
+ * Bootstrap v3.0.2 by @fat and @mdo
+ * Copyright 2013 Twitter, Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Designed and built with all the love in the world by @mdo and @fat.
+ */
+
+/**
+ ** Custom JS for Zoho (Manjit)
+ */
+ 
+ var allapps = "accounts,mdm,appcreator,crmplus,sign,crm,campaigns,contactmanager,forms,sites,salesiq,survey,social,motivator,developer,pagesense,salesinbox|books,invoice,subscriptions,expense,checkout|bugtracker,connect,docs,writer,show,mail,meeting,projects,showtime,vault,chat,wiki,calendar,workplace,cliq,sprints,sheet,notebook|assist,support,desk|people,recruit|creator,reports,events,officeapi,flow,backstage,marketplace,store,teamdrive,officeplatform,peopleplus|"
+ 
+ var allProduct = ['home', 'CRM', 'Campaigns', 'ContactManager', 'Forms', 'Sites', 'SalesIQ', 'Survey', 'Social', 'Assist', 'Support', 'BugTracker', 'Connect', 'Docs', 'Mail', 'Meeting', 'Projects', 'ShowTime', 'Vault', 'Chat', 'Books', 'Invoice', 'Subscriptions', 'Expense', 'Checkout', 'People', 'Recruit', 'Creator', 'Reports', 'Motivator', 'Accounts', 'AppCreator', 'mdm', 'Seminar', 'crmplus', 'wiki', 'Desk', 'Cliq', 'Developer', 'SalesInbox', 'Sign', 'Calendar', 'WorkPlace', 'Events', 'officeapi','Sprints', 'pagesense','flow','show','sheet','writer','notebook','one','partnerstore','backstage','marketplace','store','analytics-plus','teamdrive','officeplatform','peopleplus'];
+ 
+ // mobileServices [ [serviceName], [apple-id], [google-id], [icon]] Arrar declaration 
+ 
+ var mobileServices = [['ZohoHome', 'ZohoCRM', 'ZohoCampaigns', 'ZohoContactManager', 'ZohoForms', 'ZohoSites', 'LiveDesk', 'ZohoSurvey', 'ZohoSocial', 'ZohoAssist', 'ZohoSupport', 'ZohoBugTracker', 'ZohoPulse', 'ZohoPC', 'VirtualOffice', 'ZohoMeeting', 'ZohoProjects', 'ZohoShowtime', 'ZohoVault', 'ZohoChat', 'ZohoBooks', 'ZohoInvoice', 'ZohoSubscriptions', 'ZohoExpense', 'ZohoCheckout', 'zohopeople', 'ZohoRecruit', 'ZohoCreator', 'ZohoReports', 'ZohoMotivator', '', '', '', '', 'CRMPlus', 'ZohoWiki', 'ZohoSupport', 'ZohoChat', 'ZohoCRM', 'SalesInbox', 'ZohoSign', 'ZohoCalendar', 'VirtualOffice', '', 'OfficeAPI','ZohoSprints', 'PageSense','ZohoFlow','ZohoShow','ZohoSheet','ZohoWriter','NoteBook','ZohoOne','','ZohoBackStage','ZohomarketPlace','ZohoStore','','TeamDrive','','Peopleplus'], 
+ 
+ ['',"app-id=444908810", "app-id=804728901", "app-id=705188406", "app-id=805565969", '', "app-id=1094699978", "app-id=638610965", "app-id=906377559", "app-id=582922932", "app-id=692742510", '', "app-id=650742465", "app-id=388384804", "app-id=909262651", 'app-id=1277602149', "app-id=511887920", "app-id=925233601", "app-id=634857858", "app-id=1056478397", "app-id=710446064", "app-id=413017364", '', "app-id=966094166", '', "app-id=680525956", "app-id=981522421", "", "app-id=902365462", "app-id=1091206693", '', '', '', '', '', '', "app-id=692742510", 'app-id=1056478397', '', '', 'app-id=1236146442', '', '', '', '', 'app-id=1279756583', '', '', '', '', '','','','','','','','','','',''], 
+ 
+ ['',"app-id=com.zoho.crm", "app-id=com.zoho.campaigns", "app-id=com.zoho.cm", "app-id=com.zoho.forms.a", '', "app-id=com.zoho.salesiq", "app-id=com.zoho.survey", "app-id=com.zoho.zohosocial", "app-id=com.zoho.assist", "app-id=com.zoho.support", '', "app-id=com.zoho.zohopulse", "app-id=com.zoho.docs", "app-id=com.zoho.mail", '', "app-id=com.zoho.projects", "app-id=com.zoho.showtime.presenter", "app-id=com.zoho.vault", "app-id=com.zoho.chat", "app-id=com.zoho.books", "app-id=com.zoho.invoice", '', "app-id=com.zoho.expense", '', "app-id=com.zoho.people", "app-id=com.zoho.recurit", "", "app-id=com.zoho.reports", "app-id=com.zoho.motivator", '', '', '', '', '', '', "app-id=com.zoho.support", 'app-id=com.zoho.chat', '', '', 'app-id=com.zoho.sign.zohosign', '', '', '', '', 'app-id=com.zoho.sprints', '', '', '', '', '','','','','','','','','','','']]
+
+ // mobileServices [ [serviceName], [apple-id], [google-id], [icon]] Arrar declared.
+ 
+var metaName = ['apple-itunes-app', 'google-play-app'];
+var ss = 0;
+var appsIds = [];
+var metaHas = false;
+var android = location.href.match(/#android$/) || navigator.userAgent.match(/Android/i) != null;
+var getDomain = document.domain;
+var splitUrl = getDomain.split('.');
+var domainOne = splitUrl.pop();
+var Zdomain = splitUrl.pop();
+var ZdomainName = 'zoho';
+var ZcheckDomain = "www.local"+''+"zoho.com";
+var _globalAccess = '';
+var getusername;
+var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+var newFooter = '';
+var currentUrlLang = '';
+var langsrc = "/";
+var _com = 'com', _eu = 'eu'
+var isMobile = /iPhone|iPad|iPod|Android|BlackBerry|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent);
+//var ua = navigator.userAgent.toLowerCase(), isAndroid = ua.indexOf("android") > -1;
+//isAndroid ? jQuery('video').attr('controls', true) : '';
+$ = jQuery.noConflict();
+var countryEu = ['RS', 'VA', 'GB', 'UA', 'CH', 'SE', 'ES', 'SI', 'SK', 'RS', 'SM', 'RU', 'RO', 'PT', 'PL', 'NO', 'NL', 'ME', 'MC', 'MD', 'MT', 'MK', 'LU', 'LT', 'LI', 'LV', 'RS', 'IT', 'IM', 'IE', 'IS', 'HU', 'GR', 'GI', 'DE', 'FR', 'FI', 'FO', 'EE', 'DK', 'CZ', 'CY', 'HR', 'BG', 'BA', 'BE', 'BY', 'AT', 'AD', 'AL'];
+
+if(getDomain == ZcheckDomain){
+	ZdomainName = 'local'+''+'zoho';
+}
+
+function global_getUrlParam(sParam) {
+    var sPageURL = decodeURIComponent(window.location.search.substring(1)),sURLVariables = sPageURL.split('&'),sParameterName,i;
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }else{return '';}
+    }
+}
+
+function global_getUrlParam_sheet(sParam) {
+    var sPageURL = window.location.search.substring(1),sURLVariables = sPageURL.split('&'),sParameterName,i;
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : sParameterName[1];
+        }else{return '';}
+    }
+}
+
+function encodeFun(url){
+	url = decodeURI(url);
+	if(url.indexOf('#') > -1){
+		var _length = url.split('#').length,  _addUrl = '';
+		for(var i=1 ;i<_length; i++){
+			_addUrl+= '#'+url.split('#')[i]
+		}
+		url = url.split('#')[0]+''+encodeURI(_addUrl);
+	}
+	if(url.indexOf('?') > -1){
+		var _length = url.split('?').length,  _addUrl = '';
+		for(var i=1 ;i<_length; i++){
+			_addUrl+= '?'+url.split('?')[i]
+		}
+		url = url.split('?')[0]+''+encodeURI(_addUrl);
+	}
+	return url;
+}
+		
+function domainCheck(){
+	var _Domain = document.domain.split('').splice(0,(document.domain.split('').length-1)).join('');
+	if(document.domain.split('')[document.domain.length-1] == '.'){
+		var newDoaminOne = window.location.href.split(getDomain)[0];
+		var newDoaminTwo = window.location.href.split(getDomain)[1];
+		var _direction = newDoaminOne+''+_Domain+''+newDoaminTwo;
+		window.location.href = encodeFun(_direction);
+	}
+}
+
+domainCheck();
+
+var allProductlowerCase = [];
+for(var i=0 ;i<allProduct.length; i++){
+	allProductlowerCase[i] = allProduct[i].toLowerCase();
+}
+
+
+var langArr = ['en', 'es-xl', 'pt-br', 'de', 'fr', 'jp'];
+(window.location.host == 'prezoho.zoho.com' || window.location.host == 'zcms.zohocorp.com') ? langArr.push('zh-hans', 'nl', 'ar', 'id', 'th') : '';
+function findeLanguage(){
+	var lVal = '';
+	langArr.forEach(function(index){
+	   if(window.location.href.split('/').indexOf(index) > -1){
+			lVal = index;
+	   }
+	});
+	currentUrlLang = lVal;
+	(currentUrlLang != '') ? (langsrc = '/'+currentUrlLang+'/') : '';
+	if(lVal == 'es-xl'){
+		lVal = 'es';	
+	}else if(lVal == 'pt-br'){
+		lVal = 'pt';	
+	}else if(lVal == 'jp'){
+		lVal = 'ja';	
+	}else if(lVal == 'zh-hans'){
+		lVal = 'zh';	
+	}
+	return lVal;
+}
+
+var currentLang = findeLanguage();
+
+function getGlobalCookie(cname) {
+    var name = cname + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+
+/*
+var ipElm = document.createElement("script");
+ipElm.type = "text/javascript";
+ipElm.src = "https://iplocation.zoho.com";
+document.getElementsByTagName('head')[0].appendChild(ipElm);
+*/
+
+jQuery(document).ready(function() {
+	if(global_getUrlParam('src') == 'morelink' && $('.zoho-allapps-section-wrap').length > 0){
+		$("html, body").animate({scrollTop: $('.zoho-allapps-section-wrap').offset().top}, "slow");
+	}
+	if(domainOne == 'eu'){
+		if(!$('body').hasClass('domain-eu')){
+			var _element = document.getElementsByTagName('body')[0];
+			_element.classList.add("domain-eu");	
+		}
+	}else if(domainOne == 'com'){
+		if(!$('body').hasClass('domain-com')){
+			var _element = document.getElementsByTagName('body')[0];
+			_element.classList.add("domain-com");	
+		}
+	}
+    jQuery('.zoho-child-wrapper').toggle();
+    jQuery("#back-top").hide();
+    jQuery('.service-links ul,.partners-info,.node-type-product-help .dropBox,.featured-news .views-row .hidden-news').toggle();
+    jQuery(".service-links").click(function() {
+        jQuery(".service-links ul").slideToggle("slow");
+    });
+    jQuery(".zoho-parent-toggle").click(function() {
+if(  !(/\/reports\/help\//.test(document.URL)) &&  !(/\/developer\/help\//.test(document.URL))){
+	jQuery(this).parent().find('.zoho-child-wrapper').slideToggle();
+	if(jQuery(this).parent().hasClass('open'))
+	{
+		jQuery(this).parent().removeClass('open');
+	}
+	else
+	{
+		jQuery(this).parent().siblings().removeClass('open');
+		jQuery(this).parent().siblings().find('.zoho-child-wrapper').slideUp('slow');
+		jQuery(this).parent().addClass('open');
+	}
+}
+    });
+    jQuery('.featured-news .views-row').click(function(){
+       jQuery(this).find('.hidden-news').slideToggle('slow');
+    });
+    jQuery(".node-type-product-help #faq h4").click(function() {
+        var classtoremove = jQuery(this).attr('class');
+        if (classtoremove) {
+            jQuery(this).next('div').slideToggle('slow');
+            jQuery(this).removeClass(classtoremove);
+        } else {
+            if (jQuery(this).siblings().hasClass('open')) {
+                if (jQuery(this).siblings('.open .hidden-news, .open + .ans.dropBox').is(":visible")) {
+                    jQuery(this).addClass('open');
+                    jQuery(this).next('div').slideToggle('slow');
+                } else {
+                    var news_toggle = jQuery(this).addClass('open').siblings().removeClass('open');
+                    jQuery('.open .hidden-news, .open + .ans.dropBox').slideToggle('slow');
+                }
+            } else {
+                var news_toggle = jQuery(this).addClass('open').siblings().removeClass('open');
+                jQuery('.open .hidden-news, .open + .ans.dropBox').slideToggle('slow');
+            }
+        }
+    });
+    jQuery('.footer-wrapper a').each(function() {
+        if (jQuery(this).hasClass('zoho-and')) {
+            jQuery(this).parent().addClass('zoho-and-wrapper');
+        }
+    });
+    jQuery('.zoho-child-wrapper li a').each(function() {
+         if (/\/people\/help\//.test(document.URL) ){
+                 jQuery('.zoho-parent-toggle').remove();  
+        }
+        if (/\/people\/help\//.test(document.URL) || jQuery(this).hasClass('active')) {
+            jQuery(this).parent().parent().parent().addClass('open');
+        }
+    });
+    jQuery('.zoho-child-wrapper').each(function() {
+        if (/\/people\/help\//.test(document.URL) || jQuery(this).parent().hasClass('open')) {
+            jQuery(this).css("display", "block");
+        }
+    });
+    /*jQuery(".sliding-header-menu").affix({
+        offset: {
+            top: 120
+        }
+    });*/
+    jQuery('.countries .names').click(function() {
+        var text = jQuery(this).text();
+        jQuery('.' + text).show();
+    });
+    jQuery('.close').click(function() {
+        var divtohide = jQuery(this).attr('class').split(' ')[1].split('-')[0];
+        jQuery('.' + divtohide).hide();
+    });
+	
+  
+    // jQuery(window).keydown(function(event) {
+    //     if(event.keyCode==27) {
+    //                 hide();
+    //     }
+    // });
+    jQuery('.info').click(function() {
+        var $nid = jQuery(this).attr('class').split('_')[2];
+        jQuery('.expand_view_' + $nid).slideToggle("slow");
+    })
+    jQuery('.testimonial_addons').each(function() {
+        jQuery(this).parent().parent().parent().addClass("testimonial-wrapper");
+    });
+    jQuery(".dynamic-width:contains('True')").addClass("tick");
+    jQuery(".dynamic-width:contains('TRUE')").addClass("tick");
+    jQuery(".dynamic-width:contains('False')").addClass("cross");
+    jQuery(".dynamic-width:contains('FALSE')").addClass("cross");
+
+    /** Pricing Comparison **/
+    jQuery('.pricing-row-wrapper').each(function(i) {
+        jQuery(this).children(":first").removeClass("dynamic-width");
+        var div_count = jQuery(this).find(".dynamic-width").length;
+        var result = 70 / div_count;
+        jQuery(this).find(".dynamic-width").css("width", result + "%");
+    });
+    /** Pricing Comparison end **/
+
+    /** Pricing list tables **/
+    var totalsum = 0;
+    jQuery('.pricing-blocks .view-pricing .views-row').each(function(key, value) {
+        var width = jQuery(this).outerWidth();
+        totalsum = totalsum + width;
+    });
+    jQuery('.pricing-blocks .view-pricing .view-content').css("width", totalsum + "px");
+    /** Pricing list tables **/
+
+    /** Universal Color User **/
+    var universal_color_user = jQuery(".universal-color-user .field-content").text();
+    var universal_color_theme = jQuery(".universal-color-theme .field-item").text();
+    var universal_color_quicktabs = jQuery(".universal-color-quicktabs").text();
+    var universal_button_color = jQuery(".universal-button-color .field-item").text();
+    jQuery(".universal-color-user-1,.cell-empty-row,.pricing-faq .views-field-body a,.view-resourses-listing-page .views-field-nothing .learn-more a").css("color", universal_button_color);
+    jQuery(".dynamic-width a,.plan-bottom-wrapper a").css("background-color", universal_button_color);
+    jQuery(".products-theme").css("background-color", universal_color_theme);
+    jQuery(".quicktabs-wrapper li.active").css("border-right-color", universal_color_quicktabs);
+    jQuery(".getstarted-box a,.views-row.testimonial-wrapper .benefit-testimonial-wrapper,#footer-banner-image .get-started a").css("background-color", universal_button_color);
+    jQuery(".header-menu-2 li a.active").css("border-bottom-color", universal_button_color);
+    jQuery(".plan-wrapper[data-highlight='1'] .plan-top-wrapper").css("border-top-color", universal_button_color);
+
+    /** Universal Color User **/
+
+    jQuery("a[href='#top']").click(function() {
+        jQuery("html, body").animate({scrollTop: 0}, "slow");
+        return false;
+    });
+    var headerHeight = jQuery('#block-panels-mini-products-header-dropdown-menu').innerHeight();
+    jQuery('.look-down').click(function() {
+        jQuery("body").animate({
+            scrollTop: jQuery('.catagory-mobapps-part').offset().top - headerHeight + 55}
+        , 1000);
+    });
+    jQuery('.explore').click(function(){
+        jQuery("body").animate({ 
+            scrollTop:jQuery('.zoho-timeline').offset().top-headerHeight + 55 }
+        , 1000);
+    });
+    var homeheaderheight = jQuery('#block-panels-mini-home-page-sliding-header').innerHeight();
+    jQuery('.zoho-home-page .scroll-down .scrolldown-arrow').click(function() {
+        jQuery("body").animate({
+            scrollTop: jQuery('.pane-home-page-view-panel-pane-1').offset().top - homeheaderheight + 55}, 1000);
+
+    });
+    jQuery('.view-home-page-view').each(function(){  
+        var highestBox = 0;
+        jQuery('.view-grouping:nth-child(1),.view-grouping:nth-child(2),.view-grouping:nth-child(3)').each(function(){
+            if(jQuery(this).height() > highestBox) 
+            highestBox = jQuery(this).height();
+        });
+        jQuery('.view-grouping:nth-child(1),.view-grouping:nth-child(2),.view-grouping:nth-child(3)').height(highestBox);
+    });
+    jQuery('.view-home-page-view').each(function(){  
+        var highestBox = 0;
+        jQuery('.view-grouping:nth-child(4),.view-grouping:nth-child(5),.view-grouping:nth-child(6)').each(function(){
+            if(jQuery(this).height() > highestBox) 
+            highestBox = jQuery(this).height();
+        });
+        jQuery('.view-grouping:nth-child(4),.view-grouping:nth-child(5),.view-grouping:nth-child(6)').height(highestBox);
+    });
+
+    /** Dynamic Pricing blocks height **/
+    jQuery('.pricing-view-content-wrapper .pricing-row-wrapper').each(function(){
+        var heightofpricingblock = 0;
+        jQuery(this).children('.dynamic-width').each(function(){
+            if(jQuery(this).height() > heightofpricingblock) 
+            heightofpricingblock = jQuery(this).height();
+        });
+        jQuery(this).children('.dynamic-width').height(heightofpricingblock);
+    });
+    /** Dynamic Pricing blocks height end **/
+
+});
+
+function showhide(showhideDiv, chantxt) {
+    var divobj = document.getElementById(showhideDiv);
+    if (divobj.style.display == 'none') {
+        divobj.style.display = 'block';
+        document.getElementById(chantxt).innerHTML = '<span class="up">Up</span>';
+    }
+    else {
+        divobj.style.display = 'none';
+        document.getElementById(chantxt).innerHTML = '<span class="down">Down</span>';
+    }
+}
+
+function expcollps(curr, isexpand) {
+    var more_div = (isexpand) ? jQuery(curr) : jQuery(curr).parent().prev();
+    var less_div = (isexpand) ? jQuery(curr).next() : jQuery(curr).parent();
+    if (isexpand) {
+        jQuery('.ldjs_cnt').slideUp(700, function() {
+            jQuery('.ldjs_readmr').css('visibility', 'visible');
+        });
+        less_div.slideDown(700, function() {
+            more_div.css('visibility', 'hidden');
+        });
+
+    } else {
+        less_div.slideUp(700, function() {
+            more_div.animate({'opacity': 1}, 700).css('visibility', 'visible');
+        });
+    }
+}
+
+
+(function($) {
+    $(document).ready(function(e) {
+		var infoElm = document.createElement('script');
+		infoElm.src = "https://accounts." + ZdomainName + "." + domainOne + "/u/info";
+		if (window.location.host == "www." + ZdomainName + "." + domainOne + ".cn") {
+			infoElm.src = "https://accounts." + ZdomainName + "." + domainOne + ".cn/u/info";
+		}
+		
+		if(window.location.href.indexOf('teamdrive') < 0){
+			document.getElementsByTagName('head')[0].appendChild(infoElm);
+		}
+
+		var lan = "";
+        var href = "";
+        var href1 = "";
+        var terms = "";
+        var privacy = "/privacy.html ";
+        var security = "";
+        var antispam = "/policy.html ";
+        var refound = "";
+        var fb = "//www.facebook.com/zoho";
+        var tw = "//twitter.com/zoho";
+        var linkedin = "<a class='on-in' href='https://www.linkedin.com/company/38373' target='_blank' class='linkedin' title='LinkedIn'>'+Drupal.t('Linkedin')+'</a>";
+        var languagecode = ['/es/', '/fr/', '/it/'];
+        var lan1 = "";
+		var GDPR = '/gdpr.html';
+        var lan2 = "";
+		var moblieViewed = 0;
+		var jpcontacuus = '/contactus.html';
+		
+		// if ((window.location.host) == "www.zoho.jp") {
+		//if(window.location.href.indexOf('www.zoho.com/jp/') > 0){
+			
+				
+		if(currentUrlLang == 'jp'){
+			href = "//www.zoho.com";
+            href1 = "//www.zoho.com/jp";
+            terms = "ofservice";
+            privacy = "//www.zoho.com/jp/PrivacyPolicy.html";
+            security = "policy";
+            antispam = "//www.zoho.com/jp/SpamMailPrevention.html";
+            refound = "<li><a href='//www.zoho.jp/refund.html'>&#12458;&#12531;&#12521;&#12452;&#12531;&#27770;&#28168;&#24460;&#12398;&#12461;&#12515;&#12531;&#12475;&#12523;&#12395;&#12388;&#12356;&#12390;</a></li>";
+            fb = "//www.facebook.com/zohoJapan";
+            tw = "//twitter.com/jpzoho";
+            linkedin = "";
+			jpcontacuus = 'https://www.zoho.com/jp/crm/form/inquiry.html';
+        }
+		
+		infoElm.onload = addloginDetailedlinksCrmplus;
+		infoElm.onload = logindDetailedFroAll;
+		
+		var getTextval = $('#emailfield').val();
+        if (getTextval == "" || getTextval == null) {
+            $('#emailfield').parent().removeClass('added-placeholder');
+        } else {
+            $('#emailfield').parent().addClass('added-placeholder');
+        }
+
+        /* JS FOR PLACEHOLDER MOVING EFFECTS ENDS */
+
+        getWidth = 0; // set welcome popup width;
+        $gotoPage = '';
+        productName = '';
+
+        breaks = false;
+
+        currentProduct();
+		addString = "'" + productName + "'"
+        resetUrl(productName);
+
+        /* Header footer Common HTML Js */
+        for (var i = 0; i < languagecode.length; i++) {
+            if (window.location.href.indexOf(languagecode[i]) > -1) {
+                var url_path = window.location.pathname.split('/');
+                if (url_path[2] == (languagecode[i].slice(1, -1))) {
+                    var lan1 = languagecode[i];
+                    lan1 = lan1.slice(1);
+                    lan2 = '/' + lan1.slice(0, -1);
+                } else {
+                    var lan = languagecode[i];
+                    var lan = lan.slice(0, -1);
+                }
+            }
+        }
+		
+		var header = '<span class="menu-icon">' + Drupal.t('Menu') + '</span><div class="mask-holder hide"><div class="mobile-menu"><div class="mobile-menu-wrap"><ul><li>' + Drupal.t('Sales &amp; Marketing') + '</li><li class="bundle-container-mobile "><a class="product" href="/crm/crmplus/?src=top-header"><span class="bundle-app-icon1"></span>CRM Plus</a> </li><li><a href="' + href1 + '/crm/"><span class="app-icon1"></span>CRM</a></li><li><a href="' + href + '/pagesense/"><span class="app-icon45"></span>PageSense</a></li><li><a href="' + href + '/forms/"><span class="app-icon26"></span>Forms</a></li><li><a href="' + href + '/sign/"><span class="app-icon39"></span>Sign</a></li><li><a href="' + href + '/social/"><span class="app-icon24"></span>Social</a></li><li><a href="' + href1 +  '/salesiq/"><span class="app-icon6"></span>SalesIQ</a></li><li><a href="' + href + '/survey/"><span class="app-icon4"></span>Survey</a></li><li><a href="' + href + '/salesinbox/"><span class="app-icon36"></span>SalesInbox</a></li><li><a href="' + href1 + '/campaigns/"><span class="app-icon2"></span>Campaigns</a></li><li><a href="' + href + '/sites/"><span class="app-icon3"></span>Sites</a></li><li><a href="' + href + '/contactmanager/"><span class="app-icon18"></span>ContactManager</a></li><li><a href="' + href + '/motivator/"><span class="app-icon30"></span>Motivator</a></li></ul><ul><li>' + Drupal.t('Finance') + '</li><li class="bundle-container-mobile finance"><a class="product" href="/financeplus/?src=top-header"><span class="bundle-app-icon3"></span>Finance Plus</a> </li><li><a href="' + href + '/books/"><span class="app-icon14"></span>Books</a></li><li><a href="' + href + '/inventory/"><span class="app-icon28"></span>Inventory</a></li><li><a href="' + href + '/invoice/"><span class="app-icon15"></span>Invoice</a></li><li><a href="' + href + '/subscriptions/"><span class="app-icon15a"></span>Subscriptions</a></li><li><a href="' + href + '/expense/"><span class="app-icon27a"></span>expense</a></li><li><a href="' + href + '/checkout/"><span class="app-icon37"></span>Checkout</a></li></ul><ul><li>' + Drupal.t('Email &amp; Collaboration') + '</li><li class="bundle-container-mobile email-collab"><a class="product" href="/workplace/?src=top-header"><span class="bundle-app-icon2"></span>Workplace</a> </li><li><a href="' + href + '/mail/"><span class="app-icon10"></span>Mail</a></li><li><a href="' + href + '/cliq/"><span class="app-icon31"></span>Cliq</a></li><li><a href="' + href + '/docs/"><span class="app-icon9a"></span>Docs</a></li><li><a href="' + href + '/writer/"><span class="app-icon40"></span>Writer</a></li><li><a href="' + href + '/docs/sheet.html"><span class="app-icon42"></span>Sheet</a></li><li><a href="' + href + '/show/"><span class="app-icon44"></span>Show</a></li><li><a href="' + href + '/projects/"><span class="app-icon12"></span>Projects</a></li><li><a href="' + href + '/connect/"><span class="app-icon13"></span>Connect</a></li><li><a href="' + href + '/bugtracker/"><span class="app-icon8"></span>BugTracker</a></li><li><a href="' + href + '/meeting/"><span class="app-icon11"></span>Meeting</a></li><li><a href="' + href + '/vault/"><span class="app-icon21"></span>Vault</a></li><li><a href="' + href + '/showtime/"><span class="app-icon29"></span>ShowTime</a></li><li><a href="' + href + '/notebook/"><span class="app-icon35"></span>Notebook</a></li><li><a href="' + href + '/wiki/"><span class="app-icon38"></span>Wiki</a></li><li><a href="' + href + '/sprints/"><span class="app-icon41"></span>Sprints</a></li></ul><ul><li>' + Drupal.t('IT &amp; Help Desk') + '</li><li><a href="' + href + '/desk/"><span class="app-icon7"></span>Desk</a></li><li><a href="' + href + '/assist/"><span class="app-icon5"></span>Assist</a></li><li><a href="' + href + '/online-service-desk-software.html"><span class="app-icon32"></span>ServiceDesk Plus</a></li><li><a href="' + href + '/mdm-cloud.html"><span class="app-icon34"></span>MDM</a></li></ul><ul><li>' + Drupal.t('Human Resources') + '</li><li><a href="' + href + '/recruit/"><span class="app-icon17"></span>Recruit</a></li><li><a href="' + href + '/people/"><span class="app-icon16"></span>People</a></li></ul><ul><li>' + Drupal.t('Custom Solutions') + '</li><li><a href="' + href + '/creator/"><span class="app-icon19"></span>Creator</a></li><li><a href="' + href + '/reports/"><span class="app-icon20"></span>Reports</a></li><li><a href="' + href + '/flow/"><span class="app-icon46"></span>Flow</a></li></ul><p class="mobile-apps-link"><a href="' + href + '/mobile-apps.html">' + Drupal.t('Mobile Apps') + '</a></p></div></div></div><ul class="menu"><li class="sales-marketing"><a href="javascript:;">' + Drupal.t('Sales & Marketing') + '</a><div class="catagory-dropdown"> <div class="catagory-inner"><div class="featured-app bundle-container app-box"><a class="product" href="' + href1 + '/crm/crmplus/?src=top-header"><small class="bundle-text">' + Drupal.t('Bundle') + '</small><span class="bundle-app-icon1"></span>CRM Plus<em>' + Drupal.t('An All-In-One customer engagement suite.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href1 + '/crm/" ><span></span>CRM<em>' + Drupal.t('Close more deals in less time.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/pagesense/" ><span class="app-icon45"></span>PageSense<em>' + Drupal.t('Conversion rate optimization software.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/forms/" ><span class="app-icon26"></span>Forms<em>' + Drupal.t('Forms for mobile teams.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/sign/" ><span class="app-icon39"></span>Sign<em>' + Drupal.t('Sign and send documents.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/social/"><span class="app-icon24"></span>Social<em>' + Drupal.t('The all-in-one social media management software.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href1 + '/salesiq/" ><span class="app-icon6"></span>SalesIQ<em>' + Drupal.t('Convert website visitors into customers.') + '</em></a> </div><div class="app-box"> <a class="product" href="' + href + '/survey/" ><span class="app-icon4"></span>Survey<em>' + Drupal.t('Online surveys for every occasion.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/salesinbox/" ><span class="app-icon36"></span>SalesInbox<em>' + Drupal.t('Email for salespeople.') + '</em></a> </div><div class="app-box"><a class="product" href="' + href1 + '/campaigns/" ><span class="app-icon2"></span>Campaigns<em>' + Drupal.t('Reach and engage your customers.') + '</em></a> </div><div class="app-box"><a class="product" href="' + href + '/sites/" ><span class="app-icon3"></span>Sites<em>' + Drupal.t('Design mobile friendly websites.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/contactmanager/" ><span class="app-icon18"></span>ContactManager<em>' + Drupal.t('Absolute contact management.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/motivator/" ><span class="app-icon30"></span>Motivator<em>' + Drupal.t('Turbocharge your sales with sales activity management.') + '</em></a> </div></div></div></li><li class="finance" ><a href="javascript:;" >' + Drupal.t('Finance') + '</a><div class="catagory-dropdown"><div class="catagory-inner"><div class="featured-app bundle-container app-box"><a class="product" href="' + href1 + '/financeplus/?src=top-header"><small class="bundle-text">' + Drupal.t('Bundle') + '</small><span class="bundle-app-icon3"></span>Finance Plus<em>' + Drupal.t('Unified finance platform for business.') + '</em></a> </div><div class="app-box"><a class="product" href="' + href + '/books/" ><span class="app-icon14"></span>Books<em>' + Drupal.t(' Smart accounting for growing businesses.') + '</em></a> </div><div class="app-box"><a class="product" href="' + href + '/inventory/" ><span class="app-icon28"></span>Inventory<em>' + Drupal.t('Online inventory and order management.') + '</em></a> </div><div class="app-box"><a class="product" href="' + href + '/invoice/" ><span class="app-icon15"></span>Invoice<em>' + Drupal.t(' Hassle-free invoicing.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/subscriptions/" ><span class="app-icon15a"></span>Subscriptions<em>' + Drupal.t('Smarter billing for your subscription business.') + '</em> </a> </div><div class="app-box no-border"><a class="product" href="' + href + '/expense/" ><span class="app-icon27"></span>Expense<em>' + Drupal.t('Effortless expense reporting.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/checkout/" ><span class="app-icon37"></span>Checkout<em>' + Drupal.t('Simple one-time and recurring online payments solution.') + '</em></a> </div></div></div></li><li class="email-collab"><a href="javascript:;" >' + Drupal.t('Email & Collaboration') + '</a><div class="catagory-dropdown"><div class="catagory-inner"><div class="featured-app bundle-container app-box"><a class="product" href="' + href1 + '/workplace/?src=top-header"><small class="bundle-text">' + Drupal.t('Bundle') + '</small><span class="bundle-app-icon2"></span>Workplace<em>' + Drupal.t('All the tools for work in one Integrated site.') + '</em></a> </div><div class="app-box"><a class="product" href="' + href + '/mail/" ><span class="app-icon10"></span>Mail<em>' + Drupal.t('Business email. Clean and ad-free.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/cliq/"><span class="app-icon31"></span>Cliq<em>' + Drupal.t(' Chat that&#39;s built for work.') + '</em></a> </div><div class="app-box"><a class="product" href="' + href + '/docs/" ><span class="app-icon9a"></span>Docs<em>' + Drupal.t(' All your documents in one place.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/writer/" ><span class="app-icon40"></span>Writer<em>' + Drupal.t('A clean, crisp space to write and discuss.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/docs/sheet.html" ><span class="app-icon42"></span>Sheet<em>' + Drupal.t('The spreadsheet application for collaborative work.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/show/" ><span class="app-icon44"></span>Show<em>' + Drupal.t('Create, collaborate and broadcast presentations.') + '</em></a> </div><div class="app-box"><a class="product" href="' + href + '/projects/" ><span class="app-icon12"></span>Projects<em>' + Drupal.t('Turn every project into a success story.') + '</em></a> </div><div class="app-box"><a class="product" href="' + href + '/connect/" ><span class="app-icon13"></span>Connect<em>' + Drupal.t(' Your social workplace.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/bugtracker/" ><span class="app-icon8"></span>BugTracker<em>' + Drupal.t(' Fix bugs fast and ship great software.') + '</em></a> </div> <div class="app-box no-border"><a class="product" href="' + href + '/meeting/" ><span class="app-icon11"></span>Meeting <em>' + Drupal.t(' Web conferencing made simple and easy.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/vault/" ><span class="app-icon21"></span>Vault <em>' + Drupal.t('Online password manager for teams.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/showtime/" ><span class="app-icon29"></span>ShowTime<em>' + Drupal.t('Online training tool to engage your learners.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/notebook/" ><span class="app-icon35"></span>Notebook<em>' + Drupal.t('A beautiful home for all your notes.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/wiki/" ><span class="app-icon38"></span>Wiki<em>' + Drupal.t('Knowledge management for teams.') + '</em></a> </div><div class="app-box no-border"><a class="product" href="' + href + '/sprints/" ><span class="app-icon41"></span>Sprints<em>' + Drupal.t('Planning and tracking projects for agile teams.') + '</em></a> </div></div></div></li><li class="help-desk" ><a href="javascript:;" >' + Drupal.t('IT & Help Desk') + '</a><div class="catagory-dropdown"><div class="catagory-inner"><div class="featured-app app-box"> <a class="product" href="' + href + '/desk/" ><span class="app-icon7"></span>Desk<em>' + Drupal.t('Put customer service at the heart of your company.') + '</em></a> </div><div class="app-box"><a class="product" href="' + href + '/assist/" ><span class="app-icon5"></span>Assist <em>' + Drupal.t(' Support remote customers instantly. Manage computers located anywhere.') + '</em></a> </div><div class="app-box"><a class="product" href="' + href + '/online-service-desk-software.html"><span class="app-icon32"></span>ServiceDesk Plus<em> ' + Drupal.t('Offer best-in-class IT support on the cloud.') + '</em></a> </div><div class="app-box mdm-box"><a class="product" href="' + href + '/mdm-cloud.html"><span class="app-icon34"></span>' + Drupal.t('Mobile Device Management') + '<em>' + Drupal.t(' Easy-to-use & affordable web-based MDM solution.') + '</em></a> </div><div class="app-box no-border"><a class="product" target=" /_blank/" href="https://www.site24x7.com/" ><span class="app-icon25"></span>Site24x7<em>' + Drupal.t(' Website monitoring from a global perspective.') + '</em></a> </div></div></div></li><li class="hr" ><a href="javascript:;" >' + Drupal.t('HR') + '</a><div class="catagory-dropdown"><div class="catagory-inner"><div class="featured-app app-box"> <a class="product" href="' + href + '/recruit/" ><span class="app-icon17"></span>Recruit <em>' + Drupal.t(' Applicant tracking system.') + '</em></a> </div><div class="app-box"><a class="product" href="' + href + '/people/" ><span class="app-icon16"></span>People <em> ' + Drupal.t('Organize, automate and simplify your HR processes.') + '</em></a> </div></div></div></li><li class="business-proc" ><a href="javascript:;" >' + Drupal.t('Custom Solutions') + '</a><div class="catagory-dropdown"><div class="catagory-inner"><div class="featured-app app-box"> <a class="product" href="' + href + lan + '/creator/' + lan1 + '" ><span class="app-icon19"></span>Creator <em> ' + Drupal.t('Build custom apps for your business needs.') + '</em></a> </div><div class="app-box"><a class="product" href="' + href + '/reports/" ><span class="app-icon20"></span>Reports <em>' + Drupal.t(' Online reporting and business intelligence.') + '</em></a> </div><div class="app-box"><a class="product" href="' + href + '/flow/" ><span class="app-icon46"></span>Flow <em>' + Drupal.t(' Integrate your apps to automate business workflows.') + '</em></a> </div></div></div></li></ul><div class="dropdown-mask"></div>';
+
+        var footer = '<ul><li><a href="' + href1 + '/">' + Drupal.t('Zoho Home') + '</a></li><li><a href="' + jpcontacuus + '">' + Drupal.t('Contact') + '</a></li><li><a href="' + href1 + '/security' + security + '.html">' + Drupal.t('Security') + '</a></li><li><a href="' + href1 + '/ipr-complaints.html">' + Drupal.t('IPR Complaints') + '</a></li><li><a href="' + antispam + '">' + Drupal.t('Anti-spam Policy') + '</a></li><li id="footer-terms"><a href="' + href1 + '/terms' + terms + '.html">' + Drupal.t('Terms of Service') + '</a></li><li><a href="' + privacy + '">' + Drupal.t('Privacy Policy') + '</a></li><li id="cookie-policy"><a href="https://www.zoho.com/privacy/cookie-policy.html">' + Drupal.t('Cookie Policy') + '</a></li><li><a href="'+ GDPR +'">'+ Drupal.t('GDPR Readiness') +'</a></li>' + refound + '</ul><p>&copy; 2018, ' + Drupal.t('Zoho Corporation Pvt. Ltd. All Rights Reserved.') + '</p>';
+
+		var new_footer = '';
+		if(currentUrlLang == 'jp'){
+			new_footer = '<ul class=ZPprivacy> <li><a href="' + href1 + '/">' + Drupal.t('Zoho Home') + '</a></li><li><a href="' + jpcontacuus + '">' + Drupal.t('Contact') + '</a></li><li><a href="' + href1 + lan + lan2 + '/security' + security + '.html">' + Drupal.t('Security') + '</a></li> <li><a href="' + href1 + lan + lan2 + '/ipr-complaints.html">' + Drupal.t('IPR Complaints') + '</a></li><li><a href="' + lan + lan2 + antispam + '"> ' + Drupal.t('Anti-spam Policy') + '</a></li><li id="footer-terms"><a href="' + href1 + lan + lan2 + '/terms' + terms + '.html">' + Drupal.t('Terms of Service') + '</a></li><li><a href="' + lan + lan2 + privacy + '">' + Drupal.t('Privacy Policy') + '</a></li><li id="cookie-policy"><a href="https://www.zoho.com/privacy/cookie-policy.html">' + Drupal.t('Cookie Policy') + '</a></li><li><a href="'+ GDPR +'">'+ Drupal.t('GDPR Readiness') +'</a></li>' + refound + '</ul><p>&copy; 2018, ' + Drupal.t('Zoho Corporation Pvt. Ltd. All Rights Reserved.') + '</p>';
+		}else{
+			new_footer = '<ul class=ZPprivacy> <li><a href="' + langsrc + '">' + Drupal.t('Zoho Home') + '</a></li><li><a href="' + langsrc + 'contactus.html">' + Drupal.t('Contact') + '</a></li><li><a href="' + langsrc + 'security.html">' + Drupal.t('Security') + '</a></li> <li><a href="' + langsrc + 'ipr-complaints.html">' + Drupal.t('IPR Complaints') + '</a></li><li><a href="' + langsrc + 'policy.html"> ' + Drupal.t('Anti-spam Policy') + '</a></li><li id="footer-terms"><a href="' + langsrc + 'terms.html">' + Drupal.t('Terms of Service') + '</a></li><li><a href="' + langsrc + 'privacy.html">' + Drupal.t('Privacy Policy') + '</a></li><li id="cookie-policy"><a href="https://www.zoho.com/privacy/cookie-policy.html">' + Drupal.t('Cookie Policy') + '</a></li><li><a href="'+ langsrc +'gdpr.html">'+ Drupal.t('GDPR Readiness') +'</a></li>' + refound + '</ul><p>&copy; 2018, ' + Drupal.t('Zoho Corporation Pvt. Ltd. All Rights Reserved.') + '</p>';
+		}
+		
+		newFooter = new_footer;
+        
+		/* NEW DESIGN FOR BELOW 767px */
+		mobileView();
+		function checkCookies(){
+			if(getGlobalCookie('_z_identity') == 'true' || getGlobalCookie('_z_identity') == '_z_identity'){
+				if($("body").find("main")){
+					$('.main').addClass('umain');
+					$(document).trigger('umain-trigger');
+				}
+				if ($("body").find(".main-container-wrapper")) {
+					if(productName != "teamdrive"){
+						$('.main-container-wrapper').addClass('umain');
+					}
+				}
+			}
+		}
+			
+		checkCookies();
+		if(langArr.indexOf(currentUrlLang) > -1){
+			if($(".common-footer").length > -1){
+				if(!$(".common-footer").hasClass('common-links')){
+					$(".common-footer").addClass('common-links')		
+				}else if(!$(".common-footer").hasClass('common-links-js')){
+					$(".common-footer").addClass('common-links-js')		
+				}
+			}
+		}
+		
+		if(langArr.indexOf(currentUrlLang) > -1){
+			if(productName == 'notebook' || productName == 'writer' || productName == 'salesinbox'){
+				if(typeof $('body').attr('data-lang-list') != 'string'){
+					$('body').attr("data-lang-list" , "en,es-xl,pt-br,de,fr");
+				}
+			}
+		}
+		
+		//script.onload = urlL;
+		
+        allapps = allapps.split('|');
+		for (i = 0; i < allapps.length; i++) {
+            cat = allapps[i].split(',');
+            for (j = 0; j < cat.length; j++) {
+                if (cat[j] == productName) {
+					$(".header").append(header);
+					$(window).trigger('z-header-added');
+                    if (/\/zoholics\//.test(location.href) == false)
+                        $(".common-footer").html(footer);
+                    $(".common-links").html(new_footer);
+					if(currentUrlLang != ''){
+						dropheight();
+					}
+                    $(window).load(function() {
+					    $(".common-links-js").html(new_footer);
+						languageredirect();
+						if(currentUrlLang != ''){
+							dropheight();
+						}
+						if(productName == 'sites' || productName == 'developer' || productName == 'cliq'){
+							var aval = $('.ZPprivacy #footer-terms a').attr('href').split('terms.html').join(productName+'/terms.html');
+							$('.ZPprivacy #footer-terms a').attr('href', aval)
+						}else if(productName == 'campaigns'){
+							var aval = $('.ZPprivacy #footer-terms a').attr('href').split('terms.html').join('campaigns/zc-terms.html?src=zc-footer');
+							$('.ZPprivacy #footer-terms a').attr('href', aval);
+							$('.ZPprivacy #footer-terms a').html(Drupal.t('Terms of Use'));
+						}else if(productName == 'crm'){
+							var aval = $('.ZPprivacy #footer-terms a').attr('href').split('terms.html').join('crm/zohocrm-terms.html');
+							$('.ZPprivacy #footer-terms a').attr('href', aval)
+						}else if(productName == 'creator'){
+							var aval = 'https://www.zoho.com/creator/terms.html'
+							$('.ZPprivacy #footer-terms a').attr('href', aval)
+						}else if(productName == 'pagesense'){
+							var aval = 'https://www.zoho.com/pagesense/terms-of-use.html'
+							$('.ZPprivacy #footer-terms a').attr('href', aval)
+						}else if(productName == 'officeapi'){
+							var aval = 'https://officeapi.zoho.com/jsp/terms.jsp'
+							$('.ZPprivacy #footer-terms a').attr('href', aval)
+						}else if(productName == 'salesiq'){
+							var aval = $('.ZPprivacy #footer-terms a').attr('href').split('terms.html').join('salesiq/zoho-salesiq-terms-of-use.html');
+							$('.ZPprivacy #footer-terms a').attr('href', aval)
+						}                
+					})
+					var menuLi = $(".header .menu").children();
+                    $(menuLi[i]).addClass('selected');
+                }
+            }
+			
+            /*if (window.location.href.indexOf('/one/') > 0) {
+				if ($('#block-block-3').length > 0) {
+                    $('#block-block-3, .signing').css('display', 'none')
+                }
+            }*/
+
+        }
+		
+		if($('body').hasClass('og-context-node-17848') || window.location.pathname.split('/')[1] == 'contacts' || $('body>div').eq(0).hasClass('wpblog') || window.location.href.indexOf('/one/') > 0 ){
+			$(".header").append(header);
+			if(currentUrlLang != ''){
+				dropheight();
+			}
+			var cCount = 0;
+			function cllingMe(){
+				var intervl = setTimeout(function(){
+					if($('.common-links').length > 0){
+						($('.common-links').html() == '') ? $(".common-links").html(new_footer) : '';
+						languageredirect();
+						clearInterval(intervl);
+					}else{
+						cCount++;
+						if(cCount < 10){
+							cllingMe();
+						}
+					}
+				}, 500);
+			}
+			cllingMe();
+		}
+        //}
+		
+		
+		for(var i=0; i<$('.app-box').length; i++){
+			if($('.app-box a').eq(i).attr('href').indexOf('?src=top-header') < 0){
+				$('.app-box a').eq(i).attr('href', $('.app-box a').eq(i).attr('href')+'?src=top-header');
+			}
+		}
+
+		/* End of Header footer common HTML Js */
+
+        $('.product-header-top').html($('#mini-panel-product_menu').html());
+
+        $('.product-header-top .menu-icon-help-header > a').addClass('logo').html('ZOHO');
+
+
+        /* Remove the sites24*7 for zoho.eu*/
+        var zohoDomain = document.domain;
+        if (zohoDomain == "www.zoho.eu") {
+            $('.business-proc .no-border').remove();
+            $('.business-proc a[href="/appcreator/"]').parent().remove();
+        }
+
+        if ($('.product-header-top .product-nav-links .signing').length == 0) {
+			if(!$('.product-header-top .product-nav-links .menu').eq(0).prev().hasClass('signing')){
+				var nod = $('.signing').clone();
+				$('.product-header-top .product-nav-links .menu').eq(0).before(nod);
+			}
+	    }
+
+
+        $(window).scroll(function() { /*  slide down the menu  */
+			$('.zlang-container-inner').hide();
+            slideDown();
+        })
+        slideDown();
+
+        var clicked = false;
+        var navClick = false;
+		// menu icon event for tab view
+        $('.menu-icon').click(function() {
+            if (window.innerWidth <= 550) {
+                $('.product-menu').hide();
+            }
+
+            if (navClick == false) {
+                navClick = true;
+                $('.mask-holder').removeClass('hide');
+                setTimeout(function() {
+                    $('.mobile-menu').css({'left': '0%'});
+					var _w = parseInt(window.innerHeight) - parseInt($('.header').height());
+					$('.mobile-menu').css({'height': _w+'px'});
+                }, 100)
+
+                setTimeout(function() {
+                    $('html,body').css({'overflow': 'hidden'})
+                }, 0)
+            } else {
+                hide();
+            }
+        })
+
+		// for tab menu dropdown
+        $('.mask-holder').click(function(e) {
+			//console.log(e.delegateTarget.className+'  ::  '+e.target.className)
+            if (e.delegateTarget.className == e.target.className) {
+                hide();
+            }
+        });
+
+        /* this is for adding signout popup */
+        gotoSignupnav();
+
+        var checkVisible = $('.product-nav-links .menu').css('display');
+        $('.userinfo-container').css({
+            'display': 'block'
+        });
+		
+        $('body').click(function(e) {
+			var getsignupTarget = e.target.className;
+            var bottomSignup = e.target.parentNode.className;
+            var getTargetId = e.target.parentNode.parentNode.className;
+			if(window.location.href.indexOf('crm/what-is-crm.html') < 0){
+		    if (getsignupTarget == 'signup' || bottomSignup == 'get-started' || ($(e.target).hasClass('act-btn') && $(e.target).hasClass('cta-btn') && !$(e.target).hasClass('zwp-pricing-link'))) {
+                if (window.innerWidth > 767) {
+					if ($('.signup-box .sgfrm').length != 0 && $('.zp-home-right').css('display') != 'none') {
+                        e.preventDefault();
+                        gotoSignupnav();
+                    }
+                }
+            }
+			}
+			
+			if (e.target.className == 'menu') {} else if (e.target.className == 'mobile-menu-icon') {
+				if($('.product-nav-links .menu').css('display') == 'none'){
+					clicked = false;
+				}else{
+					clicked = true;
+				}
+				$('.product-nav-links .menu').css({
+                    'height': window.innerHeight - 50
+                });
+                if (clicked == false) {
+                    $('.menu').slideDown(300);
+                    $('body').css({'overflow': 'hidden'});
+					$('.product-nav-links .menu').css({'overflow': 'scroll'});
+                } else {
+					if(parseInt($('.mobile-menu').css('left')) < 0 || $('.mobile-menu').css('left') == 'auto'){
+						$('.product-nav-links .menu').slideUp(300);
+						$('body').css({'overflow': 'auto'});
+					}
+				}
+            } else {
+				if (clicked == true) {
+                    $('.product-nav-links .menu').slideUp(300);
+                    $('html,body').css({
+                        'overflow': 'auto'
+                    })
+                }
+            }
+
+            if (getTargetId == 'userinfo-details') {
+                $('.userinfo-details').addClass("zoho-expand");
+                if (getWidth > 285) {
+                    $('.userinfo-details.zoho-expand').css({
+                        'width': getWidth + 10,
+                        'height': '135px'
+                    });
+                }
+
+            } else {
+
+                $('.userinfo-details').removeClass("zoho-expand");
+                if (getWidth > 285) {
+                    $('.userinfo-details').css({
+                        'width': '35px',
+                        'height': '35px'
+                    });
+                    $('.product-header-top .userinfo-details, .product-header-top .userinfo-container').css({
+                        'height': '43px'
+                    });
+                }
+            }
+        })
+
+
+        $(document).on('keydown', function(e) {
+            keys = e.which;
+            if (keys == 27) {
+                $('.userinfo-details').removeClass("zoho-expand");
+            }
+        })
+
+        jQuery('.get-started a,.posibilities-bot').click(function(e) {
+            if (window.innerWidth > 767) {
+                e.preventDefault();
+                gotoSignupnav();
+            }
+
+        })
+
+
+        anchorN = $('a');
+        aa = [];
+        for (i = 0; i < anchorN.length; i++) {
+            aa[i] = $(anchorN[i]).attr('href');
+            if (aa[i] == "javascript:void(0);") {
+                $(anchorN[i]).css({
+                    "cursor": "text"
+                });
+            }
+
+        }
+		
+		window.onscroll = function() {
+			var height = jQuery(window).height();
+			var scrollTop = jQuery(window).scrollTop();
+			var obj = jQuery(".footer-wrapper");
+		   if( typeof obj !== 'undefined' ){
+			var pos = obj.position();
+			if (pos && pos.top && (height + scrollTop) > pos.top) {
+				jQuery(".service-links").css("position", "absolute");
+			}
+			else {
+				jQuery(".service-links").css("position", "fixed");
+			}
+			}
+			if (jQuery(this).scrollTop() > 200) {
+				jQuery('#back-top').fadeIn();
+				jQuery('#back-top a').css("position", "fixed");
+			}
+			else {
+				jQuery('#back-top').fadeOut();
+			}
+		}
+        /* this is for header hover animation */
+
+        var timeout;
+        var $getCh;
+        var menutimeout;
+        var mouseEnter = true;
+        var timeDelay = 200;
+		
+        $('.dropdown-mask').css({'height':  '200px'})
+        $('.header .menu >  li').hover(
+            function(e) {
+
+                $this = $(this);
+                var bposX = e.clientX;
+                timeout = setTimeout(function() {
+                    var aposX = e.clientX;
+                    if ($('.dropdown-mask').hasClass('showmaskCheck')) {
+                        timeDelay = 0;
+                        if (bposX == aposX) {
+                            $getCh = $this.children()[1];
+                            $($getCh).addClass('addMe');
+                            $('.catagory-dropdown.addMe').children().addClass('showMe');
+                        }
+                    }
+                }, timeDelay);
+            },
+            function() {
+                clearTimeout(timeout);
+                $($getCh).removeClass('addMe');
+                $('.catagory-dropdown').children().removeClass('showMe');
+            });
+
+        $('.header .menu').hover(function() {
+            if ($('.dropdown-mask').hasClass('showmaskCheck')) {
+                timeDelay = 0;
+            } else {
+                timeDelay = 200;
+            }
+            menutimeout = setTimeout(function() {
+                $('.dropdown-mask').addClass('showmask');
+            }, 100);
+            $('.dropdown-mask').addClass('showmaskCheck');
+        }, function() {
+            clearTimeout(menutimeout);
+            $('.dropdown-mask').removeClass('showmaskCheck');
+            $('.dropdown-mask').removeClass('showmask');
+            timeDelay = 200;
+        })
+
+
+
+        function hide() {
+            navClick = false;
+            $('.mobile-menu').css({
+                'left': '-100%'
+            });
+            setTimeout(function() {
+                $('.mask-holder').addClass('hide');
+            }, 100)
+
+            setTimeout(function() {
+                $('html,body').css({
+                    'overflow': 'auto'
+                });
+            }, 400)
+        }
+    
+	function slideDown(getWidth) {
+        $('.userinfo-details').removeClass("zoho-expand");
+        if (getWidth > 285) {
+            $('.userinfo-details').css({
+                'width': 35,
+                'height': 35
+            });
+            $('.product-header-top .userinfo-details, .product-header-top .userinfo-container').css({
+                'height': '43px'
+            });
+        }
+
+        if ($(window).scrollTop() > 200) {
+            $('.product-header-top').removeClass('slide');
+            $('.product-header-top').css({
+                'overflow': 'visible'
+            });
+        } else {
+            $('.product-header-top').addClass('slide');
+            $('.product-header-top').css({
+                'overflow': 'hidden'
+            });
+        }
+    }
+
+// never called - have to check
+
+    function intervelStart() {
+        setInt = setTimeout(function() {
+            count += 1;
+            if (count <= 1) {
+                $('.banner-part').css({
+                    'left': 0 - ($(bannerCh[count]).offset().left)
+                })
+                $(zSlide[count]).addClass('Zselect').siblings().removeClass('Zselect');
+                intervelStart();
+            } else {
+                $('.banner-part').css({
+                    'left': 0
+                })
+                count = 0;
+                $(zSlide[count]).addClass('Zselect').siblings().removeClass('Zselect');
+                intervelStart();
+            }
+        }, speed)
+    }
+    
+	$(window).resize(function() {
+		mobileView();
+		logindDetailedFroAll();
+		hideFeatureheader();
+		if(currentUrlLang != ''){
+			dropheight();
+		}
+		if (window.innerWidth <= 767) {
+			$('.product-nav-links .menu').css({'height': window.innerHeight - 50,'display': 'none'});
+			$('#mini-panel-product_menu .userinfo-container, .user-icon').show();
+			$('#mini-panel-product_menu .goto-link').hide();
+			$('.product-nav-links .menu .featured-apps-part').css('display','block');
+			$('#mini-panel-product_menu .zlang-container').show();
+			if($('#mini-panel-product_menu .zlang-container').length < 1 && $('.header .zlang-container').length != 0){
+				var _apElm = '<div class="zlang-container">'+$('.header .zlang-container').html()+'</div>';
+				$('#mini-panel-product_menu .menu-icon-help-header').after(_apElm);
+				$('.overMe, .zlang-container').on('mouseover', function(){
+					$(this).children('.zlang-container-inner').show();
+				});
+				$('.overMe, .zlang-container').on('mouseout', function(){
+					$(this).children('.zlang-container-inner').hide();
+				});
+				$('.zlang-container').on('click', function(){
+					$(this).children('.zlang-container-inner').show();
+				});
+			}
+	    } else {
+            $('.product-nav-links .menu').css({'height': 'auto','top': 'auto','display':'block'});
+            $('.product-header-inner .userinfo-container,.product-header-inner .goto-link').remove();
+			$('#mini-panel-product_menu .userinfo-container, #mini-panel-product_menu .goto-link, .user-icon').hide();
+			$('.product-nav-links .menu .featured-apps-part').css('display','none');
+			$('#mini-panel-product_menu .zlang-container').remove();
+	    }
+    })
+
+
+    function helpPagesResponsive(){
+		if ($('.node-type-product-help .panel-region-sidebar-first').length) {
+			$('<div id="helpMenuIconCont"><span id="help-menu">Menu</span></div>').insertBefore('.panel-region-content.crm-help-content');
+			addMenu();
+			$(window).resize(function(e) {
+				addMenu();
+				hideFeatureheader()
+			});
+
+			$('#help-menu').click(function() {
+				$('.node-type-product-help .panel-region-sidebar-first').toggleClass('slide-in');
+				$('.node-type-product-help #help-menu').toggleClass('slide-in-menu');
+				setTimeout(function() {
+					$('body').toggleClass('overflowHidden');
+				}, 500)
+			});
+		}
+
+		var benefitsCh = $('#benefits ul').children().length;
+		if (benefitsCh == 5) {
+			$('#benefits').addClass('mid-align');
+		}else if (benefitsCh == 4) {
+			$('#benefits').addClass('two-column-box');
+		}
+	}
+		
+		function addMenu() {
+			$('.node-type-product-help .panel-region-sidebar-first').is(":visible");
+			if (window.innerWidth <= 1000) {
+				$('.node-type-product-help .panel-region-sidebar-first').css({
+					'height': window.innerHeight - $('.panel-region-sidebar-first').offset().top
+				});
+			}
+		}
+		
+		function appendingMetaTag() {
+			$('meta').each(function(index, tag) {
+				var content = tag.getAttribute('name');
+				if (content == 'apple-itunes-app' || content == 'google-play-app') {
+					metaHas = true;
+					appTitle = tag.getAttribute('app-title');
+					appIcon = tag.getAttribute('app-icon');
+				}
+			});
+			if (!metaHas) {
+				if (productName == 'survey' || productName == 'inventory' || productName == 'assist') {
+					loopVal = 0
+				} else {
+					loopVal = 1;
+				}
+				for (var i = 0; i <= loopVal; i++) {
+					var meta = document.createElement('meta');
+					meta.name = metaName[i];
+					meta.content = appsIds[i];
+					document.getElementsByTagName('head')[0].appendChild(meta);
+				}
+			}
+		}
+		
+		function addsmartBanner(a){
+			if (a) {
+				if(typeof $.smartbanner != 'undefined'){
+				$.smartbanner({
+					title: a,
+					author: ' ',
+					force: android ? 'android' : 'ios',
+					daysHidden: 0,
+					daysReminder: 0
+				});
+				}
+			}
+		}
+		
+		
+		function setSigning(a, b, c){
+			var GSN = mobileServices[0][allProductlowerCase.indexOf(productName)];
+			var ssu = "https://www."+Zdomain+"."+domainOne+""+a;
+			var _serviceLang = '';
+			var _serviceUrl = '';
+			(currentLang != '')? (_serviceLang = "service_language="+currentLang+"&") : (_serviceLang = '');
+			
+			b = "https://accounts."+Zdomain+"."+domainOne+"/signin?"+_serviceLang+"servicename="+GSN+"&signupurl="+encodeURI(ssu.split('signup.html')[0]+'signup.html');
+			
+			if(productName == 'vault'){
+				b = "https://accounts."+Zdomain+"."+domainOne+"/signin?"+_serviceLang+"servicename="+GSN+"&signupurl="+encodeURI(ssu.split('signup.html')[0]+'signup.html')+''+"&serviceurl=https://vault."+Zdomain+"."+domainOne;
+			}
+			if(productName == 'officeapi'){
+				a = "https://accounts.zoho.com/accounts/register?servicename=OfficeAPI";
+			}
+			if(productName == 'sheet'){
+				_serviceUrl = 'https://sheet.'+Zdomain+'.'+domainOne+'/spreadsheets';
+				var newSeriveurl = _serviceUrl;
+				if(global_getUrlParam_sheet('serviceurl') != ''){
+					_serviceUrl = decodeURIComponent(global_getUrlParam_sheet('serviceurl'))+'&isSignIn=true';
+					newSeriveurl = decodeURIComponent(global_getUrlParam_sheet('serviceurl'));
+				}
+				b = "https://accounts.zoho.com/signin?"+_serviceLang+"servicename=ZohoSheet&signupurl="+encodeURI(ssu.split('signup.html')[0]+'signup.html?serviceurl='+encodeURIComponent(newSeriveurl))+"&serviceurl="+encodeURIComponent(_serviceUrl);
+			}else if(productName == 'marketplace'){
+				if(window.location.href.indexOf('marketplace/solutions.html') > 0){
+					b = "https://accounts."+Zdomain+"."+domainOne+"/signin?"+_serviceLang+"servicename="+GSN+"&signupurl="+encodeURI(ssu.split('signup.html')[0]+'signup.html')+''+"&serviceurl=https://www."+Zdomain+"."+domainOne+"/marketplace/solutions.html";
+				}
+			}else if(productName == 'show'){
+				b = 'https://accounts.zoho.com/signin?service_language='+currentLang+'&servicename=ZohoShow&signupurl=https://docs.zoho.com/show/signup';
+			}else if(productName == 'writer'){
+				b = 'https://accounts.zoho.com/signin?service_language='+currentLang+'&servicename=ZohoWriter&signupurl=https://writer.zoho.com/writer/signup';
+			}else if(productName == 'workplace'){
+				b = "https://accounts."+Zdomain+"."+domainOne+"/signin?"+_serviceLang+"servicename="+GSN+"&signupurl="+encodeURI(ssu.split('pricing.html')[0]+'pricing.html');
+			}else if(productName == 'mail'){
+				ssu = encodeURI('https://workplace.zoho.com/orgsignup.do');
+				b = "https://accounts."+Zdomain+"."+domainOne+"/signin?"+_serviceLang+"servicename="+GSN+"&signupurl="+encodeURI(ssu);
+			}else if(productName == 'reports'){
+				var findHelpFolder = window.location.pathname.split('/').indexOf('help');
+				var addUrl = '?';
+				if(findHelpFolder < 0){
+					var fileName = window.location.pathname.split('/')[window.location.pathname.split('/').length-1].split('.')[0];
+					var fileIndex = window.location.pathname.split('/')[2].split('.')[0];
+					if(fileName != '' && fileName != 'index'){
+						addUrl = '?zdbreferer='+fileName+'&';
+					}
+					if(fileIndex == '' || fileIndex == 'index'){
+						addUrl = '?zdbreferer=home&';
+					}
+					addUrl += 'PLANID=15&WEBSITETRYNOW=true';
+				}
+				a += addUrl;
+			}
+			var val = '';
+			(currentLang != '' && a.split('/')[1] != currentUrlLang && productName != 'writer') ? (val = '/'+currentUrlLang) : (val = val);
+			if(productName == "creator"){
+				if(window.location.pathname.split('/')[2] == 'developers' || window.location.pathname.split('/')[3] == 'developers'){
+					if(a == langsrc+'creator/signup.html'){
+						a = a.split('creator').join('creator/developers');
+					}
+				}
+			}
+			(productName == "crm") ? (b = encodeURI(b+'?plan=enterprise')) : '';
+			var signupEle = '<a class="signup" href="'+(val+a)+'">'+c+'</a>';
+			var signinEle = '<a class="signin" href="'+b+'">'+ Drupal.t("LOGIN")+'</a>';
+			
+			if(productName == 'meeting'){
+				if(window.location.href.indexOf('serviceurl=') > 0){
+					var val = window.location.href.split('serviceurl=')[1];
+					if(val.indexOf('&') > -1){
+						val = val.split('&')[0]	
+					}
+					if(val != ''){
+						signinEle = '<a class="signin" href="'+(b+'&serviceurl=https://meeting.'+Zdomain+'.'+domainOne+'/'+val)+'">'+ Drupal.t("LOGIN")+'</a>';
+					}
+				}
+				if(window.location.href.indexOf('plan=buy&service=meeting&src=meeting-pricing-buy') > 0){
+					b = 'https://meeting.zoho.com/subscription?plan=buy&service=meeting&src=meeting-pricing-buy';
+				}
+			}else if(productName == 'accounts'){
+				signupEle = '<a class="signup" href="https://accounts.zoho.com/accounts/register">'+c+'</a>';
+				signinEle = '<a class="signin" href="https://accounts.zoho.com/">'+ Drupal.t("LOGIN")+'</a>';
+			}
+			var _support = '';
+			/*(productName == "home") ? (_support = '<a href="https://help.zoho.com/portal/home">Support</a>') : '';*/
+			$('.signing').html(signupEle+''+signinEle+''+_support);
+			$('.login-text .login').attr('href',b);
+			if(productName == 'appcreator'){
+				$('.signing').html(signinEle);	
+			}
+			signupPageProductLink();	
+		}
+		
+		
+		function signupPageProductLink(){
+			var _sLink = '/'+productName;
+			var val = '';
+			(productName == 'crmplus') ? (_sLink = '/crm'+_sLink) : (_sLink = _sLink);
+			(currentLang != '') ? (val = '/'+currentUrlLang) : (val = val);
+			(currentLang != '') ? (_sLink = '/'+currentUrlLang+_sLink) : (_sLink = _sLink);
+			$('.signup-form .z-product a, .z-signup-page-wrap .signup-form a span').attr('href',  _sLink+'/'); 	
+			//$('.signing .signup').attr('href', a);
+			
+			if(window.location.href.indexOf('agencies-signup.html') > -1){
+				$('.signup-form .z-product a').attr('href', val+'/social/agencies.html')
+			}
+		}
+		
+		function hideFeatureheader() {
+			if (window.innerWidth < 768) {
+				$('.mobile-menu-icon').css({'display': 'block'});
+				$('#header .menu').css({'display': 'none'});	
+			} else {
+				$('.mobile-menu-icon').css({'display': 'none'});
+				$('#header .menu').css({'display': 'block'});
+			}
+			
+			if (window.innerWidth > 1140) {
+				$('.header .menu').css({'display': 'block'});
+			}else{
+				$('.header .menu').css({'display': 'none'});	
+			}
+			
+		}
+		
+		//  need to check
+		
+		function hidechildWrapper(){
+			if (jQuery('body').hasClass('og-context-node-3434')) {
+				if (jQuery('body').hasClass('node-type-product-help')) {
+					jQuery('.menu-panel .zoho-parent-wrapper .hasChild ').each(function(index, val) {
+						if (index == 0) {
+							var onBoardingMenuLink = jQuery(this).find('.zoho-child-wrapper li a').eq(1).text();
+							if (onBoardingMenuLink == 'Onboarding') {
+								jQuery(this).find('.zoho-child-wrapper li a').eq(1).hide()
+							}
+						}
+						if (index == 6) {
+							var onReportsMenuLink = jQuery(this).find('.zoho-child-wrapper li a').eq(0).text();
+							if (onReportsMenuLink == 'Reports') {
+								jQuery(this).find('.zoho-child-wrapper li a').eq(0).hide()
+							}
+						}
+					});
+				}
+			}
+		}
+		
+		function addCrmPath(){
+			var crmOG = jQuery('body').hasClass('og-context-node-96');
+			if (crmOG) {
+		
+				var locPath = window.location.pathname.split('/');
+				if (locPath.length == 3) {
+					jQuery('.bottom-promo .ct-action-btn').attr('href', '/crm/lp/signup.html?plan=enterprise?src=' + locPath[2] + '')
+				} else if (locPath.length > 3) {
+					jQuery('.bottom-promo .ct-action-btn').attr('href', '/crm/lp/signup.html?plan=enterprise?src=' + locPath[2] + '/' + locPath[3] + '')
+				}
+		
+			}
+		}
+		
+		function addloginDetailedlinksCrmplus() {
+			var proTi = jQuery('#mini-panel-product_menu .product-title a').text();
+			getusername = zohouser.DISPLAY_NAME;
+			if (proTi == "CRM Plus") {
+				if ((window.location.host) != "www.zoho.com.cn") {
+					if (getusername) {
+						var accessZohoCrmPlua = Drupal.t('Access Zoho CRM Plus');
+						jQuery('.signing a.goto-link').attr('href', 'https://crmplus.zoho.com/');
+						jQuery('.signing a.goto-link').text(accessZohoCrmPlua);
+						jQuery('.signing .userinfo-container .zoho-proinner-container a').text(accessZohoCrmPlua);
+						jQuery('.signing .userinfo-container .zoho-proinner-container a').attr('href', 'https://crmplus.zoho.com/');
+					} else {
+						jQuery('.signing .signin').attr('href', '/crm/crmplus/login.html');
+						jQuery('.signing .signup').attr('href', '/crm/crmplus/signup.html')
+					}
+				}
+		
+			}
+		}
+		
+		function addCrmPlusHrefLinks(){
+			var proTi = jQuery('#mini-panel-product_menu .product-title a').text();
+			if (proTi == "DRE") {
+				jQuery('#mini-panel-product_menu .menu-icon-help-header a,#mini-panel-product_menu .product-title a').attr('href', "https://www.zoho.com/");
+			}
+			if (proTi == "CRM Plus") {
+				var CrmPLUS_URL = window.location.pathname.split('/');
+				for (var i = 0; i < CrmPLUS_URL.length; i++) {
+					if (CrmPLUS_URL[1] != 'crm') {
+						lang = CrmPLUS_URL[1];
+						url = "/" + lang + "/crm/crmplus/";
+						jQuery('#mini-panel-product_menu .menu-icon-help-header a,#mini-panel-product_menu .product-title a').attr('href', url);
+						jQuery('.product-header-top .menu-icon-help-header a,.product-header-top .product-title a').attr('href', url);
+					} else if (CrmPLUS_URL[1] == 'crm' && CrmPLUS_URL[2] == 'crmplus') {
+						jQuery('#mini-panel-product_menu .menu-icon-help-header a,#mini-panel-product_menu .product-title a').attr('href', langsrc+'crm/crmplus/');
+						jQuery('.product-header-top .menu-icon-help-header a,.product-header-top .product-title a').attr('href', langsrc+'crm/crmplus/');
+					}
+				}
+			}else if (proTi == "Writer") {
+				jQuery('#mini-panel-product_menu .menu-icon-help-header a,#mini-panel-product_menu .product-title a').attr('href', langsrc+'writer/');
+				jQuery('.product-header-top .menu-icon-help-header a,.product-header-top .product-title a').attr('href', langsrc+'writer/');
+			}
+		}
+		
+		function decodeHexString(str) {
+			str = str.replace(/\\x([0-9A-Fa-f]{2})/g, function() {
+				return String.fromCharCode(parseInt(arguments[1], 16));
+			});
+			str = str.replace(/\\u([\d\w]{4})/gi, function() {
+				return String.fromCharCode(parseInt(arguments[1], 16));
+			});
+			return str;
+		}
+						
+		function addSitesPath(){
+			var prodGID = jQuery('body').hasClass('og-context-node-8078');
+			if (prodGID) {
+				jQuery('.only-common .common-links ul li:nth-child(6) a').attr('href', '/sites/terms.html');
+				jQuery('.only-common .common-links ul li:nth-child(6) a').text('Terms of Use')
+			}
+		}
+		
+		function geturL() {
+			var logedUsername = zohouser.DISPLAY_NAME;
+			if (logedUsername) {
+				$('.header').addClass('uheader');
+				if ($("body").find(".main")) {
+					$('.main').addClass('umain');
+					$(document).trigger('umain-trigger');
+				}
+			
+				if ($("body").find(".main-container-wrapper")) {
+					if(productName != "teamdrive"){
+						$('.main-container-wrapper').addClass('umain');
+					}
+				}
+			
+				getusername = decodeHexString(zohouser.DISPLAY_NAME);
+			}
+		}
+		
+		/* this is for goto signup form */
+		function gotoSignupnav() {
+			if(window.location.href.indexOf('social/hootsuite-alternative.html') < 0){
+				getAllField = $('.signup-box .sgfrm input');
+				if (getAllField.length != 0) {
+					$('html, body').animate({scrollTop: 0,}, 1000, function() {
+						setTimeout(function() {$('.focusin').removeClass('focusin');}, 500)
+					})
+					setTimeout(function() {
+						var _iput = $('.signup-box .sgfrm').eq(0).find('input');
+						(_iput.length > 1) ? _iput.eq(1).addClass('focusin').focus() : _iput.eq(0).addClass('focusin').focus();	
+					}, 1200);
+				}
+			}
+		}
+		
+		function mobileView(){
+			var insertUsericon;
+			if (!getusername) {
+				var GSN = mobileServices[0][allProductlowerCase.indexOf(productName)];
+				if (typeof GSN != 'undefined' && typeof GSN != '') {
+					var _serviceLang = '';
+					(currentLang != '')? (_serviceLang = "service_language="+currentLang+"&") : (_serviceLang = '');
+					insertUsericon = '<a class="user-icon" href="https://accounts.zoho.com/login?'+_serviceLang+'servicename=' + GSN + '">User Icon</a>'
+					_globalAccess = insertUsericon;
+				}
+			}
+			
+			if (window.innerWidth <= 767) {
+				if(moblieViewed == 0){
+					moblieViewed = 1;
+					$('.ptmenu').addClass('sticky');
+					$(insertUsericon).insertAfter('.product-nav-links .mobile-menu-icon');
+					$('.product-nav-links .menu').css({
+						'height': window.innerHeight - 50
+					});
+					$('.product-nav-links .menu').append('<li class="featured-apps-part"><div class="more-featured-apps"><h4>'+Drupal.t('Other Zoho Products')+'</h4><div class="featured-pro"> <a class="crm" href="'+langsrc+'crm/"><span></span>CRM</a> <a class="mail" href="'+langsrc+'mail/"> <span></span>Mail</a> <a class="creator" href="'+langsrc+'creator/"><span></span>Creator</a> <a class="books" target="_blank" href="/books/"><span></span>Books</a> </div><div class="more-links"><a href="https://www.zoho.com'+langsrc+'?src=morelink" class="moreapps">'+Drupal.t('More')+'</a></div></div></li>')
+				}
+			}
+			var menuLi = $(".product-header-top .menu").children();
+			$(menuLi[1]).addClass('selected');
+	
+			/* pricing common script */
+	
+			var chpriceTarget = $('.view-content');
+			var pricplan = $('body').find(chpriceTarget);
+			if ((pricplan.length) > 0) {
+				var pricplan = $(chpriceTarget).children();
+				if (pricplan.length > 3) {
+					chpriceTarget.addClass('plane-four-column');
+				}
+			}
+	
+			
+			/* pricing common script */
+		
+			/* SCRIPT FOR SMART MOBILE BANNER TO ACCEES MOBILE APPS */
+			if (userAgent.match(/iPad/i) || userAgent.match(/iPhone/i) || userAgent.match(/Android/i)) {
+				if(!window.location.href.indexOf('msignup.html') && !window.location.href.indexOf('m-signup.html')){
+				//$('.mobile-apps-wrap, .download-apps, .app-section').css('display', 'none');
+				$('.download-apps, .app-section').css('display', 'none');
+	
+				var script = document.createElement('script');
+				script.src = "https://www.zoho.com/js/zoho-smartbanner.js";
+				document.getElementsByTagName('head')[0].appendChild(script);
+				
+				script.onload = function(){
+					appTitle = '';
+					appIcon = '';
+					// Filling mobile app values in JSON 
+				 
+					// Triggering smart Banner script started.
+					appsIds = [mobileServices[1][allProductlowerCase.indexOf(productName)], mobileServices[2][allProductlowerCase.indexOf(productName)]]
+					appendingMetaTag()
+					if(langArr.indexOf(currentUrlLang) < 0 && allProductlowerCase.indexOf(productName) > -1){
+						if(!metaHas){
+							addsmartBanner('ZOHO '+allProduct[allProductlowerCase.indexOf(productName)])
+						}else{
+							addsmartBanner(appTitle);
+						}
+					}
+					
+					// Toggling smart Banner script started.
+	
+					$('.theme-toggle').on('click', function(e) {
+						e.preventDefault();
+						$.smartbanner('switchType')
+						$(this).text($(this).text() == 'Preview Android' ? 'Preview iOS' : 'Preview Android')
+					})
+					if (android) $('.theme-toggle').text('Preview iOS');
+				}
+				}
+			}
+		}
+		
+		function logindDetailedFroAll() {
+			if((window.innerWidth > 992) && (window.innerHeight < 800 )){
+				if($('.signup-form').length > 0){
+					var testiHeight = $('.signup-form').height();
+					//$('.signup-form').css('margin-top','115px');
+				}
+				
+				if($('.testimonial-content').length > 0){
+					var testiHeight= $('.testimonial-content').innerHeight();
+					$('.testimonial-content').css('margin-top', ((window.innerHeight-20)-testiHeight)/2);
+				} 
+			}
+			if (typeof zohouser == 'undefined') {
+				return;
+			}
+			getusername = zohouser.DISPLAY_NAME;
+			geturL();
+			if (getusername) {
+				$('.signing .signup, .signing .signin, .signup-box').hide();
+			}
+			if (!getusername) {
+				if($('.loggedin-userinfo').length > 0){
+					$('.loggedin-userinfo').hide();
+				}
+				if(window.location.href.indexOf('pricing-comparison.html') > 0 || window.location.href.indexOf('pricing.html') > 0){
+					$('.signing .signup').hide();
+				}else{
+					$('.signing .signup').show();	
+				}
+				
+				if(window.innerWidth > 991){
+					$('.signup-box').show();
+				}
+				$('.signing .signin').show();
+				$('.try-now').addClass('signupbtn-hide').removeClass('signupbtn-show');
+				var zsignup_url = "/" + productName + "/";
+				var zsignup_text = Drupal.t("Sign Up Now");
+				
+				
+				var zsignup_products = ['meeting','workplace','assist','salesiq'];
+				var zsignup_url_Arr = ['signup.html?version=freetrial&service=meeting&src=topbar-try', 'pricing.html', 							                              'signup.html?version=freetrial', 'signup.html?source=Website.Header'];
+				
+				
+				if(zsignup_products.indexOf(productName) > -1){
+					zsignup_url += zsignup_url_Arr[zsignup_products.indexOf(productName)];
+					if(productName == "mail" || productName == "workplace"){
+						zsignup_text = Drupal.t("Get Started");
+					}else if (productName == 'docs') {
+						zsignup_text = Drupal.t("Get Started Now");
+					}
+				}else {
+					zsignup_url += "signup.html";
+				}
+				
+				var loginProductArr = ['show', 'writer', 'crmplus', 'appcreator', 'crm'];
+				href = '';
+				(currentLang != '') ? (href = '/'+currentUrlLang) : (href = href);
+				var aVal = href + zsignup_url;
+				var bVal = href + '/' + productName;
+				var cVal = zsignup_text;
+				if(loginProductArr.indexOf(productName) < 0){
+					var bVal = href + '/' + productName+"/login.html";
+					(productName == 'home') ? (aVal = (aVal.split('/home')[0] + aVal.split('/home')[1])) : '';
+					(productName == 'mail') ? (aVal = '/workplace/pricing.html') : '';
+					setSigning(aVal, bVal, cVal);
+				}
+				
+				if(loginProductArr.indexOf(productName) > -1){
+					if(productName == 'crmplus'){
+						if ((window.location.host) != "www.zoho.com.cn") {
+							aVal = langsrc+"crm/crmplus/signup.html";
+							bVal = "crm/crmplus/login.html";
+							cVal = Drupal.t("Sign Up");
+						}
+					}else if(productName == 'crm'){
+						var _PN = window.location.pathname;
+						aVal = langsrc+"crm/lp/signup.html?src=top";
+						bVal = "/crm/lp/login.html";
+						if (_PN != '/crm/index.html' && _PN != '/crm/zohocrm-pricing.html' && _PN != '/crm/comparison.html') {
+							cVal = Drupal.t('Get Started');
+						} else {
+							cVal = Drupal.t('Sign Up Now');
+						}
+					}else if(productName == 'show' || productName == 'writer'){
+						aVal = "https://docs.zoho.com/"+productName+"/signup";
+						bVal = "https://docs.zoho.com/"+productName+"/signup?signin=true";
+						cVal = Drupal.t('Get Started Now');
+					}
+					setSigning(aVal, bVal, cVal);
+				}
+				
+				$('.header .signing .signin').css({
+					'opacity': 1
+				});
+				if (window.innerWidth <= 767) {
+					$('.user-icon').css({
+						'display': 'block'
+					})
+				}
+				/****For language based signup ***/
+			/*
+				var langaug = ['es', 'it', 'fr', 'jp'];
+				jQuery(langaug).each(function(intValue, currentElement) {
+					if (window.location.href.indexOf('/' + currentElement + '/') > -1) {
+						var href = '/' + currentElement;
+						var href1 = $('.signing .signup').attr('href');
+						var url_path = window.location.pathname.split('/');
+						console.log(currentElement+'  ::  '+$('.signing .signup').attr('href')+'  ::  '+href+'  ::  '+href1)
+						jQuery('.signing .signup').attr('href', href1);
+					}
+				});*/
+			} else {
+				signupPageProductLink();
+				getusername = decodeHexString(zohouser.DISPLAY_NAME);
+				$('.try-now').addClass('signupbtn-show').removeClass('signupbtn-hide');
+				$('#navbar').addClass('uheader');
+				var getHref = window.location.href;
+				if (k2 == 'crm' || k2 == 'contactmanager' || k2 == 'salesiq' || k2 == 'bugtracker' || k2 == 'showtime' || k2 == 'appcreator') {
+					k2 = allProduct[allProductlowerCase.indexOf(productName)];
+				}else if (k2 == 'crmplus') {
+					k2 = 'CRM Plus';
+				} /*else if (k2 == 'show') {
+					k2 = 'Docs';
+				}*/ else if (k2 == 'officeapi') {
+					k2 = 'Office API';
+				}else if (k2 == 'pagesense') {
+					k2 = 'PageSense';
+				}else if (k2 == 'teamdrive') {
+					k2 = 'TeamDrive';
+				}
+				/*getusername = encodeURI(getusername)
+				getusername = getusername.split('%2520').join(' ');
+				getusername = getusername.split('%20').join(' ');
+				getusername = decodeURI(getusername);*/
+				var logOutUrl = 'https://accounts.zoho.com/logout?serviceurl=' + getHref;
+				var insertsignIn = '<div class="userinfo-container"><div class="userinfo-details"><div class="zoho-proinner-container"><span id="userinfo-name">' + getusername + '</span><a class="userinfo-access" href=' + $gotoPage + ' target="_blank">' + accessZoho +' '+ k2 + '</a></div><div class="userinfo-avatar"><img src=' + $userAvator + ' alt=' + getusername + ' class="userPho"/></div><div class="account-signout-details"><a target="_blank" class="userinfo-account" href="https://accounts.' + k + '.com/u/h#home">' + myAccount + '</a><a id="userinfo-signout" href="#">' + signOut + '</a></div></div></div><a href=' + $gotoPage + ' class="goto-link">' + accessZoho +' '+ k2 + '</a>'
+				$('.signing .goto-link').hide();
+				if (window.innerWidth <= 767) {
+					if ($('#mini-panel-product_menu .userinfo-container').length == 0) {
+						$(insertsignIn).insertAfter('#mini-panel-product_menu .menu-icon-help-header');
+						$('.account-signout-details #userinfo-signout').attr("href", logOutUrl);
+					}
+					jQuery('.getstartedbox .signup-btn.mobile-btn, .zp-home-left .act-btn.cta-btn, .content-wrap .act-btn.cta-btn').css('display', 'inline-block').attr('href', $gotoPage).html(accessZoho +' '+ k2);
+					(productName == 'writer') ? $('.act-btn.cta-btn').html('Start Writing') : '';
+					(productName == 'marketplace') ? $('.act-btn.cta-btn').html('Start building now').attr('href', 'https://marketplace.'+Zdomain+'.'+domainOne+'/buildextension') : '';
+				} else {
+					if ($('body').find('.header').length > 0) {
+						jQuery('.getstartedbox .signup-btn.mobile-btn, .zp-home-left .act-btn.cta-btn, .content-wrap .act-btn.cta-btn').css('display', 'inline-block').attr('href', $gotoPage).html(accessZoho +' '+ k2);
+						(productName == 'writer') ? $('.act-btn.cta-btn').html('Start Writing') : '';
+						(productName == 'marketplace') ? $('.act-btn.cta-btn').html('Start building now').attr('href', 'https://marketplace.'+Zdomain+'.'+domainOne+'/buildextension') : '';
+						var headIS = $('body').find('.home-bg');
+						if (headIS.length != 1) {
+							$('.signing').html(insertsignIn);
+							$('.account-signout-details #userinfo-signout').attr("href", logOutUrl);
+							setTimeout(function() {
+								var m = $('.signing .goto-link').innerWidth();
+								var checkProinner = $('body').find('.zoho-proinner-container');
+								if (checkProinner.length != 0) {
+									var m1 = $('.zoho-proinner-container').css('padding-left').replace('px', '');
+									getWidth = m + parseInt(m1);
+								}
+							}, 100)
+						}
+					}
+				}
+				
+				if($(".loggedin-userinfo").length > 0){
+					if(productName == "assist"){
+						var href = document.location.href;
+						if ( href.indexOf( "?") != -1){
+							var params = href.split( "?")[1];
+							var param = params.split("&");
+							$gotoPage ="https://assist.zoho.com/login/redirect-page.jsp"+"?"+params;
+						}else{
+							$gotoPage ="https://assist.zoho.com/login/redirect-page.jsp";
+						}
+					}
+					$(".loggedin-userinfo").show()
+					$('.signup-form h3,.signup-box,.login-text').hide();  
+					if($('.access-apps').length < 1){
+						/*getusername = encodeURI(getusername)
+						getusername = getusername.split('%2520').join(' ');
+						getusername = getusername.split('%20').join(' ');
+						getusername = decodeURI(getusername);*/
+						$(".loggedin-userinfo").append(" <h2 class='username'>"+Drupal.t('Welcome')+" <span>"+getusername+"!</span></h2> <a class='access-apps' href="+$gotoPage+"></a>");  
+						$(".loggedin-userinfo .access-apps").html(accessZoho+" "+k2)
+					}
+				}
+				
+				$(".banner-content .getstarted-box").replaceWith("<div class='learn-more'><a href='features.html'>"+Drupal.t("Learn More")+"</a>");
+				$('.gr-sign').replaceWith("<a class='gr-sign' href='https://bugtracker.zoho.com/portals.do'>"+Drupal.t("Try Now")+"</a>");
+				$('.gr-sign1').replaceWith("<a class='gr-sign1' href='https://bugtracker.zoho.com/portals.do'>"+Drupal.t("Try Now")+"</a>");
+				$(".buz .ms").html("<a href='https://bugtracker.zoho.com/portals.do'>"+Drupal.t("Get Started Now")+"</a>");
+				if (k2 == 'bugtracker') {
+					$(".three .signup").html("<a href='https://bugtracker.zoho.com/portals.do'>"+Drupal.t("Try Now")+"</a>");
+				}
+				/*For Common*/
+				$('.navbar-toggle').css('top', '30px');
+			}
+			setTimeout(function() {
+				if (jQuery('#mini-panel-product_menu').length != 0) {
+					var getTop = $('#mini-panel-product_menu').offset().top;
+					$(".mask-holder,.mobile-menu").css({
+						'top': getTop
+					});
+				}
+			}, 200)
+			
+			setTimeout(function() {
+				var m = $('.signing .goto-link').innerWidth();
+				var checkProinner = $('body').find('.zoho-proinner-container');
+				if (checkProinner.length != 0) {
+					var m1 = $('.zoho-proinner-container').css('padding-left').replace('px', '');
+					getWidth = m + parseInt(m1);
+				}
+			}, 100);
+			
+			$('.signing > a, .user-icon').css({'opacity': '1', 'visibility' : 'visible'})
+			$('.signing .goto-link').hide();
+		}
+		
+		function resetUrl(productName) {
+			m = window.location.href;
+			m = m.replace("http://www.", '');
+			m = m.replace("https://www.", '');
+			m = m.replace("http://", '');
+			m = m.replace("https://", '');
+			k = m.split(".com");
+			if (k[1] != null) {
+				findEs = k[1].split('/');
+				if (productName == 'crm' && findEs.indexOf('es') > -1) {
+					accessZoho = 'Accesar Zoho ';
+					myAccount = 'Mi Cuenta';
+					signOut = 'Salir';
+				} else {
+					accessZoho = Drupal.t('Access Zoho');
+					myAccount = Drupal.t('My Account');
+					signOut = Drupal.t('Sign Out');
+				}
+			}
+			if (k.length > 1) {
+				k = k[0];
+				k2 = productName;
+			} else {
+				k2 = '';
+			}
+		
+			var k2product = ['crm','projects','bugtracker','people','assist','survey','sites','social','meeting','vault','recruit','creator','contactmanager','motivator','crmplus','appcreator','reports','wiki','show','writer','desk','cliq','developer','salesinbox','officeapi','sprints'];
+			
+			var k2productLink = ['https://crm.zoho.com/crm/ShowHomePage.do','https://projects.zoho.com/portals.do','https://bugtracker.zoho.com/portals.do','https://people.zoho.com/people','https://assist.zoho.com/assist','https://survey.zoho.com/home.do','https://sites.zoho.com/index','https://social.'+Zdomain+'.com/Home.do','https://meeting.zoho.com/jsp/service-check.jsp?service=meeting','https://vault.zoho.com/online/main','https://recruit.zoho.com/recruit/ShowHomePage.do','https://creator.zoho.com/home','https://cm.zoho.com/index.do','https://motivator.zoho.com/home.html','https://crmplus.zoho.com/','https://appcreator.zoho.com','https://reports.zoho.com','https://wiki.zoho.com','https://show.zoho.com/presentations','https://writer.zoho.com/','https://desk.zoho.com/','https://cliq.zoho.com/index.do','https://developer.zoho.com/','https://salesinbox.zoho.'+_com+'/salesinbox/ShowHomePage.do', 'https://officeapi.zoho.com','https://sprints.zoho.com/team.do'];
+			
+			/* thisis for product homepage link url*/
+			$userAvator = 'https://contacts.zoho.com/file?t=user&fs=thumb';
+			
+			(k2product.indexOf(k2) > -1) ? $gotoPage = k2productLink[k2product.indexOf(k2)] : $gotoPage = 'https://' + k2 + '.zoho.com';
+		}
+		
+		function currentProduct(){
+			var url = window.location.href.split('/');
+			findproduct:
+				for (var k = 0; k < url.length; k++) {
+					for (var m = 0; m < allProduct.length; m++) {
+						if (allProduct[m].toLowerCase() == url[k]) {
+							if (allProduct[m].toLowerCase() != 'crm' && allProduct[m].toLowerCase() != 'docs') {
+								productName = allProduct[m].toLowerCase();
+								break findproduct;
+							}
+							if (allProduct[m].toLowerCase() == 'crm') {
+								if (url[k + 1] != 'crmplus') {
+									productName = 'crm'
+								} 
+								if(url[k + 1] == 'crmplus') {
+									productName = 'crmplus'
+								}
+							}
+							if (allProduct[m].toLowerCase() == 'docs') {
+								if ((url[k + 1] != 'writer') || (url[k + 1] != 'writer.html') || (url[k + 1] != 'show') || (url[k + 1] != 'show.html')) {
+									productName = 'docs';
+								}
+								if ((url[k + 1] == 'writer') || (url[k + 1] == 'writer.html')) {
+									productName = 'writer';
+								}
+								if ((url[k + 1] == 'show') || (url[k + 1] == 'show.html')) {
+									productName = 'show';
+								}
+								if ((url[k + 1] == 'sheet') || (url[k + 1] == 'sheet.html')) {
+									productName = 'sheet';
+								}
+							}
+						}
+						
+					}
+				}
+		
+			if (productName == 'social') {
+				if (url[3] == 'crm' && url[5] == 'social') {
+					productName = 'crm';
+				}
+			}
+            
+			if(productName != 'crmplus'){
+				if(url.indexOf('crm') > 0 && productName != 'campaigns'){
+					productName = 'crm';
+				}else if(url.indexOf('creator') > 0 && productName != 'developer'){
+					productName = 'creator';
+				}
+			}
+			if (productName == 'campaigns') {
+				if (url[3] == 'crm' && url[5] == 'campaigns') {
+					productName = 'crm';
+				}
+			}
+			var urlPath = window.location.pathname;
+			(urlPath.split('/')[1] == 'one' || urlPath.split('/')[2] == 'one') ? (productName = 'one') : '';
+			
+			(productName == '') ? (productName = 'home') : '';
+			(productName == 'analytics-plus') ? (productName = 'analyticsplus') : '';
+			console.log(productName);
+			
+			/*var _newProduct = '';
+			var _splt = urlPath.split('/');
+			if(allProductlowerCase.indexOf(_splt[1]) > -1){
+				_newProduct = _splt[1];
+			}else if(allProductlowerCase.indexOf(_splt[2]) > -1){
+				_newProduct = _splt[2];
+			}
+			console.log(_newProduct);*/
+				
+		}
+		
+		function signupfieldcheck(){
+			setTimeout(function(){
+				if($('.signup-box').length > 0){
+					for(var i=0; i<$('.sgfrm input').length; i++){
+						if($('.sgfrm input').eq(i).val() != 'undefined' && $('.signup-box').css('display') == 'block'){
+							if($('.sgfrm input').eq(i).val() != ''){
+								if($('.sgfrm input').eq(i).prev().hasClass('placeholder')){
+									$('.sgfrm input').eq(i).parent().addClass('added-placeholder');
+								}
+							}
+						}
+					}
+				}
+			}, 500);
+		}
+		
+		$(document).on('blur', 'input', function() {
+			var getTextval = $(this).val();
+			if (getTextval == "" || getTextval == null) {
+				$(this).parent().removeClass('added-placeholder');
+			} else {
+				$(this).parent().addClass('added-placeholder');
+			}
+		}).on('focus', 'input', function() {
+			var getTextval = $(this).val()
+			if (getTextval == "" || getTextval == null) {
+				$(this).parent().removeClass('').addClass('added-placeholder');
+			} else {
+				$(this).parent().addClass('added-placeholder');
+			}
+		}).on('change', 'input', function() {
+			signupfieldcheck()
+		});
+		
+		
+		helpPagesResponsive();
+		//EuRedirection();
+		addCrmPlusHrefLinks();
+		addSitesPath();
+		addCrmPath();
+		hidechildWrapper();
+		hideFeatureheader();
+		
+		checkIpAppend();
+		
+		$('.navbar-toggle').click(function(e) {
+			e.stopPropagation();
+			$('.header-menu-2 ul.menu').slideToggle();
+		});
+		
+		// login local - zoho handling
+		if ($('#zohoiam').length > 0) {
+			var sourceVal = $('#zohoiam').attr('src').split('.zoho.').join('.' + ZdomainName + '.');
+			$('#zohoiam').attr('src', sourceVal)
+		}
+		
+		setTimeout(function() {
+			jQuery('.animation-wrap > div').each(function(i) {
+				var t = jQuery(this);
+				setTimeout(function() {
+					t.addClass('animated');
+				}, (i + 1) * 100);
+			});
+		}, 100)
+	
+		/* feature list */
+		var getAlllist = jQuery('.features-list').children();
+		var gerAlltopval = [];
+		for (var i = 0; i < getAlllist.length; i++) {
+			gerAlltopval[i] = jQuery(getAlllist[i]).offset().top - window.innerHeight + jQuery('.features-list li').innerHeight();
+		}
+	
+		jQuery(window).scroll(function() {
+			var sTop = jQuery(window).scrollTop();
+			for (var i = 0; i < getAlllist.length; i++) {
+				if (sTop > gerAlltopval[i]) {
+					if (i % 2 == 1) {
+						jQuery(getAlllist[i]).addClass('from-right');
+					} else {
+						jQuery(getAlllist[i]).addClass('from-left');
+					}
+				}
+			}
+	
+			if (sTop > gerAlltopval[getAlllist.length - 1] + 150) {
+				jQuery('.bottom-signup,.download-features a').css({
+					'opacity': 1
+				})
+			}
+	
+			jQuery('.product-header.sub-header').css({
+				'top': -76
+			});
+		})
+	
+	
+		var clicked = false;
+		var checkVisible = jQuery('.product-menu').css('display');
+		jQuery('body').click(function(e) {
+			if (e.target.className == 'product-menu') {} else if (e.target.className == 'sub-menu-icon') {
+				if (clicked == false) {
+					clicked = true;
+					jQuery('.product-menu').slideDown(300);
+				} else {
+					clicked = false;
+					jQuery('.product-menu').slideUp(300);
+				}
+			} else {
+				if (clicked == true) {
+					clicked = false;
+	
+					jQuery('.product-menu').slideUp(300);
+					jQuery('html,body').css({'overflow': 'auto'})
+				}
+			}
+		})
+	
+		jQuery('.product-menu li').click(function(e) {
+			var getClass = jQuery(this).attr('class');
+			var getSplit = getClass.split('-');
+			if (getSplit[0] == 'crmplus') {
+				e.preventDefault();
+				var moveTotop = jQuery("section[data=" + getSplit[1] + "]").offset().top;
+				jQuery('html, body').animate({
+					scrollTop: moveTotop - jQuery('.sub-header').innerHeight(),
+				}, 1000, "easeInOutQuad")
+			}
+		})
+	
+		if(productName != "teamdrive"){
+			jQuery('.bottom-signup,.signing .signup').click(function(e) {
+				if(productName == 'crm'){
+					return;
+				}
+				e.preventDefault();
+				jQuery('html, body').animate({
+					scrollTop: 0,
+				}, 1000, "easeInOutQuad")
+				setTimeout(function() {
+					jQuery('.signup-box div:first-child input').focus();
+				}, 1000)
+			});
+		}
+	
+	});
+})(jQuery);
+
+
+; /**/
+
+
+/***************** ADD ANIMATION SCRIPT *******************/
+;
+(function(jQuery) {
+    jQuery.fn.visible = function(partial) {
+        var jQueryt = jQuery(this),
+            jQueryw = jQuery(window),
+            viewTop = jQueryw.scrollTop() - 200,
+            viewBottom = viewTop + jQueryw.height(),
+            _top = (jQueryt.length > 0) ? (jQueryt.offset().top) + 250 : 0,
+            _bottom = _top + jQueryt.height(),
+            compareTop = partial === true ? _bottom : _top,
+            compareBottom = partial === true ? _top : _bottom;
+        return ((compareBottom <= viewBottom) && (compareTop >= viewTop));
+    };
+})(jQuery);
+(function(jQuery) {
+    function animation() {
+        if (jQuery(window).width() > 767) {
+            jQuery(".content-wrap:not(.animated)").each(function() {
+                var jQuerythis = jQuery(this),
+                    jQuerydelay = (jQuerythis.attr('data-delay')) ? jQuerythis.attr('data-delay') : 0;
+                setTimeout(function() {
+                    if (jQuerythis.visible(true)) {
+                        jQuerythis.addClass(jQuerythis.attr('data-animation'));
+                        jQuerythis.addClass('animated');
+                    }
+                }, jQuerydelay);
+            });
+        }
+    }
+    jQuery(document).ready(function() {
+        animation();
+    });
+    jQuery(window).resize(function() {
+        animation();
+    });
+    jQuery(window).scroll(function() {
+        animation();
+    });
+})(jQuery);
+/***************** ADD ANIMATION SCRIPT *******************/
+
+
+/* To override zohoGASignupEvent function called for GTM */
+function zohoGASignupEvent() {}
+function zohoFedClickEvent() {}
+function zcTrackClick(){}
+
+
+//*CHINA site header-footer starts*// 
+jQuery(document).ready(function() {
+    if ((window.location.host) == "www.zoho.com.cn") {
+        var footer = '<div class="common-footer"><ul><li><a href="https://www.zoho.com.cn/">Zoho&#39318;&#39029;</a></li><li><a href="https://www.zoho.com.cn/contactus.html">&#32852;&#31995;&#25105;&#20204;</a></li><li><a href="https://www.zoho.com.cn/aboutus.html">Zoho&#21382;&#21490;</a></li><li><a href="https://www.zoho.com.cn/press.html">&#20135;&#21697;&#36164;&#35759;</a></li><li><a href="https://www.zoho.com.cn/articles.html">&#21457;&#24067;&#35266;&#28857;</a></li><li><a href="https://www.zoho.com.cn/partners.html" rel="nofollow">&#20195;&#29702;&#21512;&#20316;</a></li><li><a href="https://www.zoho.com.cn/security.html"rel="nofollow">&#23433;&#20840;&#20445;&#38556;</a></li><li><a href="https://www.zoho.com.cn/ipr-complaints.html" rel="nofollow">&#30693;&#35782;&#20135;&#26435;&#30003;&#35785;</a></li><li><a href="https://www.zoho.com.cn/policy.html" rel="nofollow">&#21453;&#22403;&#22334;&#37038;&#20214;&#25919;&#31574;</a></li><li><a href="https://www.zoho.com.cn/terms.html" rel="nofollow">&#26381;&#21153;&#26465;&#27454;</a></li><li><a href="https://www.zoho.com.cn/privacy.html" rel="nofollow">&#38544;&#31169;&#25919;&#31574;</a></li></ul><p>© 2018, Zoho Corporation.&#20445;&#30041;&#25152;&#26377;&#26435;&#21033;.</p><p>&#21271;&#20140;&#24066;&#28023;&#28096;&#21306;&#30693;&#26149;&#36335;6&#21495;&#38182;&#31179;&#22269;&#38469;&#22823;&#21414;B&#24231;13&#23618;  400-660-8680</p><p>&#20140;ICP&#22791;15015257&#21495;&nbsp;&nbsp;&#20140;ICP&#35777;150718&#21495;</p><p>&#21451;&#24773;&#38142;&#25509;&#65306;QQ1610576843&nbsp;&nbsp; <a href="https://www.bangongyi.com" target="_blank">&#24494;&#20449;&#21150;&#20844;</a> &nbsp;&nbsp;<a href="https://www.fangcloud.com/" target="_blank">&#20159;&#26041;&#20113;</a></p><div class="china-social"> <a class=on-weibo target="_blank" href="https://weibo.com/zohochina" rel="nofollow"></a><!--&#24494;&#20449;--><a class="on-vchat1"> </a><a class="on-vchat2"> </a><!--&#24494;&#20449;&#32467;&#26463;--></div><div class="footer-zohologo"> <a href="https://www.zoho.com.cn/"><img src="images/zoho.png" alt="&#20225;&#19994;&#20113;&#26381;&#21153;" title="&#20113;&#26381;&#21153;"></a> </div></div>';
+        $(".sales-marketing .app-box:nth-child(2)").css("display", "none");
+        $(".sales-marketing .app-box:nth-child(4)").css("display", "none");
+        $(".sales-marketing .app-box:nth-child(6)").css("display", "none");
+        $(".sales-marketing .app-box:nth-child(8)").css("display", "none");
+        $(".sales-marketing .app-box:nth-child(9)").css("display", "none");
+        $(".sales-marketing .app-box:nth-child(10)").css("display", "none");
+        $(".email-collab .app-box:nth-child(4)").css("display", "none");
+        $(".email-collab .app-box:nth-child(5)").css("display", "none");
+        $(".email-collab .app-box:nth-child(6)").css("display", "none");
+        $(".email-collab .app-box:nth-child(7)").css("display", "none");
+        $(".email-collab .app-box:nth-child(8)").css("display", "none");
+        $(".help-desk .app-box:nth-child(2)").css("display", "none");
+        $(".help-desk .app-box:nth-child(3)").css("display", "none");
+        $(".help-desk .app-box:nth-child(4)").css("display", "none");
+        $(".finance").css("display", "none");
+        $(".business-proc .app-box:nth-child(3)").css("display", "none");
+        $(".business-proc .app-box:nth-child(4)").css("display", "none");
+        $(".common-links").html(footer);
+
+        var allProduct = ['crm', 'crmplus', 'campaigns', 'survey', 'salesiq', 'mail', 'notebook', 'docs', 'projects', 'chat', 'desk', 'recruit', 'people', 'creator', 'reports'];
+        var url = window.location.href.split('/');
+        for (var k = 0; k < url.length; k++) {
+            for (var m = 0; m < allProduct.length; m++) {
+                if (allProduct[m] == url[k]) {
+                    $(".menu-icon-help-header a ,.product-title a").attr("href", "/" + url[k] + "/");
+                    $('.signing').html('<a class="signup" href="/' + allProduct[m] + '/signup.html">' + Drupal.t("Sign Up") + '</a> <a class="signin" href="/' + allProduct[m] + '/login.html">' + Drupal.t("LOGIN") + '</a>');
+                }
+            }
+        }
+    }
+});
+
+				
+$(window).load(function() {
+   if (domainOne == "eu") {
+        $('.vi-linkedin, .vi-office365').hide();
+    }
+    if ((window.location.host) == "www.zoho.com.cn") {
+        $("a[href*='.com']").attr("href", function(i, href) {
+            return href.replace('zoho.com/', 'zoho.com.cn/');
+        });
+    }
+});
+
+
+function zSignupPrevent() {
+	var getsignupClass = document.getElementsByClassName('disabled-z-signup').length;
+	if (0 < getsignupClass) {
+		return false;
+	}
+}
+//*CHINA site header-footer ends*// // JavaScript Document
+
+/******************Quick Links JS - START ***********************/
+
+jQuery(window).load(function() {
+    jQuery('.quick-connect-links').hide();
+    jQuery('.quick-connect-links-wrap .show-links-btn').hide()
+    jQuery('.hide-links-btn').click(function() {
+        jQuery('.quick-connect-links').animate({
+            'left': 225
+        }, '1000');
+        jQuery('.quick-connect-links-wrap .show-links-btn').show()
+        jQuery('.quick-connect-links-wrap .show-links-btn').animate({
+            'right': 0
+        }, '1500');
+    });
+    jQuery('.show-links-btn').click(function() {
+        jQuery('.quick-connect-links').show()
+        jQuery('.quick-connect-links').animate({
+            'left': 0
+        }, '1000');
+        jQuery('.quick-connect-links-wrap .show-links-btn').show('slow')
+        jQuery('.quick-connect-links-wrap .show-links-btn').animate({
+            'right': -45
+        }, '1200');
+    })
+});
+
+jQuery(window).load(function() {
+    var ref = document.referrer;
+    if (ref == "") {
+        jQuery('.quick-connect-links').show()
+        jQuery('.quick-connect-links').animate({
+            'left': 0
+        }, '1000');
+        jQuery('.quick-connect-links-wrap .show-links-btn').animate({
+            'right': -45
+        }, '1200');
+    } else {
+        jQuery('.quick-connect-links').animate({
+            'left': 225
+        }, '1000');
+        jQuery('.quick-connect-links-wrap .show-links-btn').show()
+        jQuery('.quick-connect-links-wrap .show-links-btn').animate({
+            'right': 0
+        }, '1500');
+
+    }
+});
+
+/******************Quick Links JS - END ***********************/
+
+
+/****************************************Footer Content Starts****************************************/
+
+$(document).ready(function(){
+	var winWidth = $(window).width();
+	
+	if(window.innerWidth < 480){
+	var inervl = setInterval(function(){
+		if($(".footer-sec-wrap .product-links").length > 0){
+			clearInterval(inervl);
+			if($(".footer-sec-wrap .product-links ul.contact-zoho").length <= 0) {
+				var contactLinks = '<ul class="contact-zoho" > <li><a href="/">'+ Drupal.t('Zoho Home')+'</a></li><li><a href='+langsrc+'contactus.html>'+ Drupal.t('Contact')+'</a></li></ul>';
+				var privacyLinks = '<ul class="security-policy" > <li><a href='+langsrc+'security.html>'+ Drupal.t('Security')+'</a></li> <li><a href='+langsrc+'ipr-complaints.html>'+ Drupal.t('IPR Complaints') + '</a></li><li><a href='+langsrc+'policy.html> Anti-spam Policy</a></li><li id="footer-terms"><a href='+langsrc+'terms.html>' + Drupal.t('Terms of Service') + '</a></li><li><a href='+langsrc+'privacy.html>' + Drupal.t('Privacy Policy') + '</a></li><li id="cookie-policy"><a href="https://www.zoho.com/privacy/cookie-policy.html">' + Drupal.t('Cookie Policy') + '</a></li><li><a href='+langsrc+'gdpr.html>'+ Drupal.t('GDPR Readiness') +'</a></li></ul>';
+				if($('.footer-links-wrap .product-links').hasClass('one-column')){
+					$('.footer-links-wrap .one-column div').eq(0).prepend('<h4>Quick Links</h4>')
+				}
+				 var contact = "<div><h4>"+Drupal.t("Contact")+"</h4>"+contactLinks+"</div>";
+				 contact += "<div><h4>"+Drupal.t("Security and Privacy")+"</h4>"+privacyLinks+"</div>";
+				$(".footer-sec-wrap .product-links").append(contact);
+			}
+			
+			$(".footer-sec-wrap .product-links ul.contact-zoho").parent("div").css({"display": "none"});
+			$(".footer-sec-wrap .product-links ul.security-policy").parent("div").css({"display": "none"});
+			
+			$(window).resize(function(){
+				if($(this).width() != winWidth){
+					winWidth = $(this).width();
+					changeFooterView();
+				}
+			});
+			
+			changeFooterView();
+			
+			$(".footer-sec-wrap .product-links h4").on("click",function(){
+				if(window.innerWidth < 480){
+					if($(this).hasClass("active")) {
+						$(this).removeClass("active");
+						$(this).next("ul").slideUp();
+					}
+					else {
+						$(".footer-sec-wrap .product-links ul").slideUp();
+						$(".footer-sec-wrap .product-links h4").removeClass("active");
+						$(this).addClass("active");
+						$(this).next("ul").slideDown();
+					}
+				}
+			});
+			
+			function changeFooterView() {
+				if(window.innerWidth < 480){
+					$(".footer-sec-wrap .product-links ul").slideUp();
+					$(".footer-sec-wrap .product-links h4").removeClass("active");
+					$(".footer-sec-wrap .product-links ul.contact-zoho").parent("div").css({"display": "block"});
+					$(".footer-sec-wrap .product-links ul.security-policy").parent("div").css({"display": "block"});
+					if(productName == 'reports'){
+						$('.lang-support').prev().hide();
+						$('.lang-support').hide();
+					}
+				}
+				else {
+					$(".footer-sec-wrap .product-links ul").slideDown();
+					$(".footer-sec-wrap .product-links ul ul").slideUp();
+					$(".footer-sec-wrap .product-links h4").removeClass("active");
+					$(".footer-sec-wrap .product-links ul.contact-zoho").parent("div").css({"display": "none"});
+					$(".footer-sec-wrap .product-links ul.security-policy").parent("div").css({"display": "none"});
+					if(productName == 'reports'){
+						$('.lang-support').show();
+						$('.lang-support').prev().show();
+					}
+				}
+			}	
+		}
+	},500);
+	}
+});
+
+window.onload = function() {
+	if ($('body').hasClass('og-context-node-20384') || $('body').hasClass('og-context-node-17577')) {
+		//if(domainOne == 'com'){
+			//var _href = window.location.href.split('.com')[1].split('/')[1];
+			if (langArr.indexOf(currentUrlLang) > -1) {
+				var footer = "<div class='region region-footer'><section id='block-zoho-navigation-links-product-pages-footer-links'><div class='footer-sec-wrap'><div class='content-wrap'><div class='footer-links-wrap'><div class='common-links common-links-js'><ul><li><a href='"+langsrc+"'>" + Drupal.t('Zoho Home') + "</a></li><li><a href="+langsrc+"contactus.html>" + Drupal.t('Contact') + "</a></li><li><a href="+langsrc+"security.html>" + Drupal.t('Security') + "</a></li> <li><a href="+langsrc+"ipr-complaints.html>" + Drupal.t('IPR Complaints') + "</a></li><li><a href="+langsrc+"policy.html>" + Drupal.t('Anti-spam Policy') + "</a></li><li><a href="+langsrc+"terms.html>" + Drupal.t('Terms of Service') + "</a></li><li><a href="+langsrc+"privacy.html>" + Drupal.t('Privacy Policy') + "</a></li></ul><p>&copy; 2018, " + Drupal.t('Zoho Corporation Pvt. Ltd. All Rights Reserved.') + "</p></div></div></div></section></div>";
+				jQuery('.footer-wrapper footer').append(footer);
+				jQuery('.common-links:before').css("background", "none");
+			}
+		//}
+    }
+
+}
+
+/****************************************Footer Content Ends***************************************/
+
+var  scriptCheck = 0;
+var countryCodeArr = countryEu;
+function checkIpAppend(){
+	for(var i=0; i<$('script').length; i++){
+		if($('script').eq(i).attr('src') == 'https://www.zoho.com/js/ipcallback.js'){
+			scriptCheck++;
+		}
+	}
+	if(scriptCheck == 0){
+		countryEu = ['RS', 'VA', 'GB', 'UA', 'CH', 'SE', 'ES', 'SI', 'SK', 'RS', 'SM', 'RU', 'RO', 'PT', 'PL', 'NO', 'NL', 'ME', 'MC', 'MD', 'MT', 'MK', 'LU', 'LT', 'LI', 'LV', 'RS', 'IT', 'IM', 'IE', 'IS', 'HU', 'GR', 'GI', 'DE', 'FR', 'FI', 'FO', 'EE', 'DK', 'CZ', 'CY', 'HR', 'BG', 'BA', 'BE', 'BY', 'AT', 'AD', 'AL'];
+		EuRedirection();
+	}
+}
+
+function ipLoaded(){
+	clearInterval(ipIntervalTime)
+	EuRedirection();
+}
+
+function langStrip(){
+	var gotoCountry = CountryCode.toLowerCase();
+	(CountryCode.toLowerCase() == 'br') ? (gotoCountry = 'pt-br') : '';
+	var countryLatin = ['ES','AR','BO','CL','CO','EC','GF','PY','PE','SR','UY','VE','MX'];
+	(countryLatin.indexOf(CountryCode) > -1) ? (gotoCountry = 'es-xl') : '';
+	
+	var _ele = document.getElementsByTagName('body')[0].getAttribute("data-lang-list");
+	if(_ele != null && _ele != 'undefined'){
+		var detectedLangNew = document.getElementsByTagName('body')[0].getAttribute('data-lang-list').split(','), detectedLang = [];
+		for(var i=0; i<detectedLangNew.length; i++){
+			if(langArr.indexOf(detectedLangNew[i]) > -1){
+				var _x = langArr[langArr.indexOf(detectedLangNew[i])];
+				if(_x != 'en' && _x != 'jp'){
+					detectedLang.push(langArr[langArr.indexOf(detectedLangNew[i])]);
+				}
+			}	   
+		}
+		
+		var _loaded = localStorage.getItem('zloaded') == '1';
+		try { }catch(err) { _loaded = true;}
+		if(detectedLang.indexOf(gotoCountry) > -1 && window.location.pathname.split('/')[1] != gotoCountry && !_loaded){
+			var _txt = '', _btnTxt = '', _lo = window.location.href;
+			if(gotoCountry == 'fr'){_txt = 'Vous pouvez maintenant naviguer en français!'; _btnTxt =  'Bonjour';}else if(gotoCountry == 'de'){_txt = 'Sie können jetzt die deutsche Suchfunktion nutzen!'; _btnTxt =  'Hallo';}else if(gotoCountry == 'pt-br'){_txt = 'Agora você pode navegar em português!'; _btnTxt =  'Olá';}else if(gotoCountry == 'es-xl'){_txt = '¡Ahora puede navegar en español!'; _btnTxt =  'Hola';}
+			
+			$('body').prepend('<div class="langstrip"><span class="langTxt">'+_txt+'</span><span class="langBtn">'+_btnTxt+'</span><span class="langClose">X</span></div>');
+			$('.langstrip').css('display', 'block');
+			$('.langstrip .langClose').on('click', function(){
+				try {
+					localStorage.setItem('zloaded', '1');
+				}catch(err) {}
+				$('.langstrip').remove();
+			});
+			
+			$('.langstrip .langBtn').on('click', function(){
+				if(currentUrlLang == ''){
+					_lo = _lo.split(window.location.host).join(window.location.host+'/'+gotoCountry);
+				}else{
+					_lo = _lo.split('/'+currentUrlLang+'/').join('/'+gotoCountry+'/');
+				}
+				window.location = encodeURI(_lo);
+				try {
+					localStorage.setItem('zloaded', '1');
+				}catch(err) {}
+			});
+		}
+	}
+}
+
+function coockieStrip(){
+	if($('.cookiestrip').length < 1){
+		var cookieStorage = localStorage.getItem('coockiechecked') == '1';
+		if(domainOne == 'eu' && !cookieStorage){
+			var _txt = 'We use cookies to help us understand and serve you better. Take a look at our <a href="https://www.zoho.com/privacy/cookie-policy.html">Cookie Policy.</a>';
+			(currentUrlLang == 'fr') ? _txt = 'Nous utilisons les cookies pour mieux vous comprendre et mieux vous satisfaire. Consultez notre <a href="https://www.zoho.com/privacy/cookie-policy.html">Politique relative aux cookies.</a>' : '';
+			(currentUrlLang == 'de') ? _txt = 'Wir nutzen Cookies, um Sie besser zu verstehen und Ihnen einen noch besseren Service anzubieten. Werfen Sie einen Blick auf unsere <a href="https://www.zoho.com/privacy/cookie-policy.html">Cookie-Richtlinie.</a>' : '';
+			(currentUrlLang == 'pt-br') ? _txt = 'Usamos cookies para nos ajudar a compreender e atendê-lo melhor. Veja a nossa <a href="https://www.zoho.com/privacy/cookie-policy.html">Política de cookies.</a>' : '';
+			(currentUrlLang == 'es-xl') ? _txt = 'Utilizamos cookies para poder entenderlo mejor y brindarle un servicio superior. Revise nuestra <a href="https://www.zoho.com/privacy/cookie-policy.html">Política de cookies.</a>' : '';
+			$('body').prepend('<div class="cookiestrip"><span class="cookieTxt">' + _txt + '</span><span class="cookieClose">X</span></div>');
+			$('.cookieClose').on('click', function () {
+				try {
+					localStorage.setItem('coockiechecked', '1');
+				} catch (err) {}
+				$('.cookiestrip').remove();
+			});
+		}
+	}
+}
+	
+function EuRedirection(){
+	if(typeof CountryCode != 'undefined') {
+		if(countryEu.indexOf(CountryCode) > -1){
+			if(!$('body').hasClass('ccode-eucountries')){
+				var _element = document.getElementsByTagName('body')[0];
+				_element.classList.add("ccode-eucountries");	
+			}
+		}
+	}
+	if(currentUrlLang != ''){
+		if(!$('body').hasClass('other-lang')){
+			var _element = document.getElementsByTagName('body')[0];
+				_element.classList.add("other-lang");		
+		}
+	}
+	if(currentUrlLang != 'jp'){
+		if(typeof CountryCode != 'undefined') {
+			if(!$('body').hasClass('ccode-in')){
+				var _element = document.getElementsByTagName('body')[0];
+				_element.classList.add("ccode-"+CountryCode.toLowerCase());
+			}
+			var _zcom = 'com', _zeu = 'eu';
+			var _lo = window.location.href;	
+			if(window.location.href.indexOf('?rdc') > -1){
+				try {
+					localStorage.setItem('lanchanged', '1');
+				}catch(err) {}	
+			}
+			var langStorage = localStorage.getItem('lanchanged') == '1';
+			try {
+				localStorage.setItem('lanchanged', '1');
+			}catch(err) {
+				langStorage = true;
+			}
+			
+			if(countryEu.indexOf(CountryCode) > -1 && !langStorage && domainOne != 'eu'){
+				_lo = encodeURI(_lo.split('zoho.'+_zcom).join('zoho.'+_zeu));
+				window.location = _lo;
+			}
+		}
+	}
+}
+	
+//  EU Redirection End  //
+
+
+function testimonialHeight() {
+	var _height, _getHeight;
+	_height = 0;
+	$('.z-testimonial-head').removeAttr('style');
+	$('.z-testimonial-head').find('h4').each(function() {
+		_getHeight = $(this).innerHeight();
+		if (_getHeight > _height) {
+			_height = _getHeight;
+		}
+	});
+	$('.z-testimonial-head').height(_height);
+	$('.z-testimonial-head').find('h4').removeAttr('style');
+	$('.z-testimonial-head').removeClass('active');
+	$('.z-testimonial-head').find('h4').each(function() {
+		$(this).height($(this).innerHeight());
+	});
+	$('.z-testimonial-head').addClass('active');
+}
+
+/*SET EQUAL HEIGHT FOR TESTIMONIAL HEAD*/
+if($('.z-testimonial-item').length > 1) {   
+	testimonialHeight();
+}
+/*SET EQUAL HEIGHT FOR TESTIMONIAL HEAD*/
+
+/* change href links as per the language */
+
+function languageredirect(){
+	if(domainOne == "eu") {
+		if(currentUrlLang == ''){
+			$('#cookie-policy').css('display','inline-block');
+		}
+	}
+	if(typeof CountryCode != 'undefined') {
+		langStrip();
+	}
+	if(domainOne == "eu") {
+		coockieStrip();
+	}
+	if(currentUrlLang != 'jp'){
+	if(typeof $('body').attr('data-lang-list') == 'string'){
+		var detectedLangNew = $('body').attr('data-lang-list').split(',');
+		var detectedLang = [];
+		for(var i=0; i<langArr.length; i++){
+			if(detectedLangNew.indexOf(langArr[i]) > -1){
+				detectedLang.push(langArr[i])
+            }	   
+		}
+		//var detectedLang = ['en','fr','de','es-xl','pt-br'];
+		var _com = 'com', _eu = 'eu';
+		if(detectedLang.length > 1){
+			var _val = 'English';
+			if(typeof CountryCode != 'undefined') {
+				if(countryEu.indexOf(CountryCode) > -1){
+					if(domainOne == 'eu'){
+						detectedLang.unshift('.com');
+					}else if(domainOne == 'com'){
+						detectedLang.unshift('.eu');
+					}
+				}
+			}
+		
+			if(detectedLang.indexOf(window.location.pathname.split('/')[1]) < 0){
+				(detectedLang.indexOf('en') > -1) ? detectedLang.splice(detectedLang.indexOf('en'),1) : '';
+			}else{
+				detectedLang.splice(detectedLang.indexOf(window.location.pathname.split('/')[1]),1);
+				_val = window.location.pathname.split('/')[1]
+			}
+			(_val == 'fr') ? (_val = 'Français') : (_val == 'de') ? (_val = 'Deutsch') : (_val == 'es-xl') ? (_val = 'Español') : (_val == 'pt-br') ? (_val = 'Português') : (_val == 'nl') ? (_val = 'Dutch') : (_val == 'zh-hans') ? (_val = 'Chinese') : (_val == 'ar') ? (_val = 'Arabic') : (_val == 'id') ? (_val = 'Bhasha') : (_val == 'th') ? (_val = 'Thai') : '';
+
+			var _apElm = '<div class="zlang-container"><span class="zlang-text">'+_val+'</span><div class="zlang-container-inner" style="display: none;"><ul></ul></div></div>'
+			$('.common-links').append(_apElm);
+			$('.header .signing').after(_apElm);
+			(window.innerWidth <= 767) ? $('#mini-panel-product_menu .menu-icon-help-header').after(_apElm) : '';
+			
+			//(window.innerWidth > 767) ? $('#mini-panel-product_menu .zlang-container').hide() : '';
+			
+			if(typeof CountryCode != 'undefined') {
+				if(countryEu.indexOf(CountryCode) > -1){
+					$('.zlang-container').addClass('lang-domain-show')
+				}
+			}
+			
+			for(var i=0; i<detectedLang.length; i++){
+				if(langArr.indexOf(detectedLang[i]) > -1 || (detectedLang[i] == 'en' && langArr.indexOf(detectedLang[i]) < 0) || (detectedLang[i] == '.com' && langArr.indexOf(detectedLang[i]) < 0) || (detectedLang[i] == '.eu' && langArr.indexOf(detectedLang[i]) < 0)){
+					var _langCountry = 'English';
+					(detectedLang[i] == 'fr') ? (_langCountry = 'Français') : (detectedLang[i] == 'de') ? (_langCountry = 'Deutsch') : (detectedLang[i] == 'es-xl') ? (_langCountry = 'Español') : (detectedLang[i] == 'pt-br') ? (_langCountry = 'Português') : (detectedLang[i] == 'nl') ? (_langCountry = 'Dutch') : (detectedLang[i] == 'zh-hans') ? (_langCountry = 'Chinese') : (detectedLang[i] == 'ar') ? (_langCountry = 'Arabic') : (detectedLang[i] == 'id') ? (_langCountry = 'Bhasha') : (detectedLang[i] == 'th') ? (_langCountry = 'Thai') : '';
+					var _myClass = '';
+					if(detectedLang[i] == '.com'){
+						_langCountry = 'zoho.'+_com;
+						_myClass = 'class="lang-domain"';
+					}else if(detectedLang[i] == '.eu'){
+						_langCountry = 'zoho.'+_eu;
+						_myClass = 'class="lang-domain"';
+					}
+					
+					
+					if(_langCountry == 'zoho.'+_eu || _langCountry == 'zoho.'+_com){_myClass = 'class="lang-domain"';}
+					$('.zlang-container-inner ul').append('<li '+_myClass+'><a href="'+movelocation(detectedLang[i])+'">'+_langCountry+'</a></li>');
+				}
+			}
+			$('.zlang-text').show();
+			$('.overMe, .zlang-container').on('mouseover', function(){
+				$(this).children('.zlang-container-inner').show();
+			});
+			$('.overMe, .zlang-container').on('mouseout', function(){
+				$(this).children('.zlang-container-inner').hide();
+			});
+			$('.zlang-container').on('click', function(){
+				$(this).children('.zlang-container-inner').show();
+			});
+		}
+		
+		}
+	}
+}
+
+function movelocation(a){
+		var _loation = window.location.href;
+		var HrefLink = '';
+		if(a == '.com'){
+			var v = '?rdc';
+			if(window.location.href.indexOf('?rdc') > -1){ v = '';}
+			HrefLink = encodeFun(window.location.origin.split('eu').join('com')+window.location.href.split(window.location.origin)[1]+v)
+		}else if(a == '.eu'){
+			HrefLink = encodeFun(window.location.origin.split('com').join('eu')+window.location.href.split(window.location.origin)[1])
+			if(HrefLink.indexOf('?rdc') > 0){HrefLink = encodeURI(HrefLink.split('?rdc').join(''));}
+		}else{
+			if(langArr.indexOf(window.location.pathname.split('/')[1]) > -1){
+				_loation = '/'+window.location.href.split('/'+langArr[langArr.indexOf(window.location.pathname.split('/')[1])]+'/')[1];
+			}else{
+				_loation = _loation.split(window.location.host)[1];
+			}
+			(a == 'en') ? (HrefLink = encodeFun(window.location.href.split(window.location.pathname)[0] + _loation)) : 
+			(HrefLink = encodeFun(window.location.href.split(window.location.pathname)[0] +'/' + a + ''+_loation));
+			if(HrefLink.indexOf('?rdc') > 0){HrefLink = encodeURI(HrefLink.split('?rdc').join(''));}
+		}
+		//window.location = HrefLink;
+		return HrefLink;
+}
+
+
+
+$(document).ready(function(e) {
+	$('.header .logo, .header-part .logo').attr('href', langsrc)
+    function resetLangUrl(){
+		if(langArr.indexOf(currentUrlLang) > -1){
+			for(var i=0; i<$('body a').length; i++){
+				if($('body a').eq(i).attr('href') != 'undefined' && $('body a').eq(i).attr('href') != null && $('body a').eq(i).attr('href') != ''){
+					var _cOne = ($('body a').eq(i).attr('href').split('/').indexOf('help') < 0);
+					var _cTwo = ($('body a').eq(i).attr('href').indexOf('/userguide/') < 0);
+					var _cThree = ($('body a').eq(i).attr('href').indexOf('/resources/') < 0);
+					var _cFour = ($('body a').eq(i).attr('href').indexOf('/resources.html') < 0);
+					var _cFive = ($('body a').eq(i).attr('href').indexOf('blog') < 0);
+					var _cSix = window.location.href != 'https://www.zoho.com/assist/lp/demo-registration.html?src=pricing-faq';
+					var _cSeven = ($('body a').eq(i).attr('href').indexOf('.pdf') < 0);
+					var _cEight = ($('body a').eq(i).attr('href').indexOf('.exe') < 0);
+					var _cNine = ($('body a').eq(i).attr('href').indexOf('/get-support-plugin.html') < 0);
+					var _cTen = ($('body a').eq(i).attr('href').indexOf('/demo-registration.html') < 0);
+					var _cOneOne = ($('body a').eq(i).attr('href').indexOf('/extension/zoho-assist.xpi') < 0);
+					var _cOneTwo = ($('body a').eq(i).attr('href').indexOf('/books/') < 0);
+					var _cOneThree = ($('body a').eq(i).attr('href').indexOf('/expense/') < 0);
+					var _cOneFour = ($('body a').eq(i).attr('href').indexOf('/invoice/') < 0);
+					var _cOneFive = ($('body a').eq(i).attr('href').indexOf('/subscriptions/') < 0);
+					var _cOneSix = ($('body a').eq(i).attr('href').indexOf('/inventory/') < 0);
+					var _cOneSeven = ($('body a').eq(i).attr('href').indexOf('/checkout/') < 0);
+					var _cOneEight = ($('body a').eq(i).attr('href').indexOf('/gst/') < 0);
+					var _cOneNine = ($('body a').eq(i).attr('href').indexOf('recruit/referrals.html') < 0);
+					var _cOneTen = ($('body a').eq(i).attr('href').indexOf('.deb') < 0);
+					var _cTwoOne = ($('body a').eq(i).attr('href').indexOf('https://www.zoho.com/campaigns/contact-us.html') < 0);
+					var _cTwoTwo = ($('body a').eq(i).attr('href').indexOf('https://www.zoho.com/survey/education-discount.html') < 0);
+					var _cTwoThree = ($('body a').eq(i).attr('href').indexOf('https://www.zoho.com/developer/signup.html') < 0);
+					var _cTwoFour = ($('body a').eq(i).attr('href').indexOf('reports/onpremise/eula.html') < 0);
+					var _cTwoFive = ($('body a').eq(i).attr('href').indexOf('reports/onpremise/get-quote.html') < 0);
+					var _cTwoSix = ($('body a').eq(i).attr('href').indexOf('cliq/developers/terms.html') < 0);
+					var _cTwoSeven = ($('body a').eq(i).attr('href').indexOf('/developer/') < 0);
+					var _cTwoEight = ($('body a').eq(i).attr('href').indexOf('/creator/request-quote.html') < 0);
+					var _cTwoNine = ($('body a').eq(i).attr('href').indexOf('/sprints/contact.html') < 0);
+					
+					
+					if(_cOne && _cTwo && _cThree && _cFour && _cFive && _cSix && _cSeven && _cEight && _cNine && _cTen && _cOneOne && _cOneTwo && _cOneThree && _cOneFour && _cOneFive && _cOneSix && _cOneSeven && _cOneEight && _cOneNine && _cOneTen && _cTwoOne && _cTwoTwo && _cTwoThree && _cTwoFour && _cTwoFive && _cTwoSix && _cTwoSeven && _cTwoEight && _cTwoNine){
+						if($('body a').eq(i).attr('href').split('/')[1] == productName){
+							var _hRef = encodeURI('/'+currentUrlLang + $('body a').eq(i).attr('href'));
+							$('body a').eq(i).attr('href', _hRef);
+						}else if($('body a').eq(i).attr('href').split('/')[2] == 'www.zoho.com'){
+							if((allProductlowerCase.indexOf($('body a').eq(i).attr('href').split('/')[3]) > -1)){
+								var _hRef = encodeURI('https://www.zoho.com/'+currentUrlLang+$('body a').eq(i).attr('href').split('www.zoho.com')[1]);
+								$('body a').eq(i).attr('href', _hRef);
+							}
+						}else if($('body a').eq(i).attr('href').split('/')[2] == 'www.zoho.com'){
+							if(allProductlowerCase.indexOf($('body a').eq(i).attr('href').split('/')[3]) > -1){
+								var _hRef = encodeURI('https://www.zoho.com/'+currentUrlLang+$('body a').eq(i).attr('href').split('www.zoho.com')[1]);
+								$('body a').eq(i).attr('href', _hRef);
+							}
+						}else if(window.location.pathname == "/gdpr.html" || window.location.pathname == "/privacy.html" || window.location.pathname == "/terms.html" || window.location.pathname == "/policy.html" || window.location.pathname == "/ipr-complaints.html" || window.location.pathname == "/security.html"){
+							var _hRef = encodeURI('https://www.zoho.com/'+currentUrlLang+$('body a').eq(i).attr('href').split('www.zoho.com')[1]);
+							$('body a').eq(i).attr('href', _hRef);				
+						}
+					}
+					if($('body a').eq(i).attr('href').indexOf('help') > -1 || $('body a').eq(i).attr('href').indexOf('blog') > -1){
+						$('body a').eq(i).attr('target' , '_blank');
+						if($('body a').eq(i).attr('href').split('/'+currentUrlLang+'/') > -1){
+							var _hRef = encodeURI($('body a').eq(i).attr('href').split.split('/'+currentUrlLang+'/').join('/'));
+							$('body a').eq(i).attr('href', _hRef);
+						}
+					}
+				}
+			}
+		}	
+	}
+	
+	function hederLang(){
+		var bokksArr = ['/books/', '/expense/', '/invoice/', '/subscriptions/', '/inventory/', '/checkout/', '/gst/'];
+		var av = ['/expense/', '/invoice/', '/subscriptions/', '/inventory/','/books/'];
+		for(var i=0; i<$('.header li .product').length; i++){
+			if($('.header li .product').eq(i).attr('href').split('/').indexOf(currentUrlLang) < 0){
+				var getHref = $('.header li .product').eq(i).attr('href');
+				var _hRef = encodeURI('/'+currentUrlLang + getHref);
+				var _cheknine = $('body a').eq(i).attr('href').indexOf('online-service-desk-software.html') > -1;
+				var _chekten = $('body a').eq(i).attr('href').indexOf('mdm-cloud.html') > -1;
+				if(_cheknine || _chekten){
+					$('.header li .product').eq(i).attr('target' , '_blank');
+				}else if(getHref.indexOf('https://www.site24x7.com/') < 0){
+					if($('.header li .product').eq(i).parents().hasClass('finance')){
+						var _val = $('.header li .product').eq(i).attr('href');
+						if(_val.indexOf('?') > -1){
+							_val = _val.split('?')[0];	
+						}
+						if(((currentUrlLang == 'de' || currentUrlLang == 'fr' || currentUrlLang == 'es-xl') && av.indexOf(_val) > -1) || ((_val == '/books/' || _val == '/invoice/') && currentUrlLang == 'pt-br')){
+							$('.header li .product').eq(i).attr('href' , _hRef);
+						}else{
+							$('.header li .product').eq(i).attr('target' , '_blank');
+						}
+					}else{
+						$('.header li .product').eq(i).attr('href' , _hRef);
+					}
+				}
+			}	
+		}
+		if(currentUrlLang != ''){
+			for(var i=0; i<$('.mobile-menu .mobile-menu-wrap li').length; i++){
+				var _val = $('.mobile-menu .mobile-menu-wrap li').eq(i).find('a').attr('href');
+				if(_val != 'undefined' && _val != null && _val != ''){
+					if(allProductlowerCase.indexOf(_val.split('/')[1]) > -1){
+						if(_val.indexOf('?') > -1){
+							_val = _val.split('?')[0];	
+						}
+						if(bokksArr.indexOf(_val) < 0){
+							$('.mobile-menu .mobile-menu-wrap li').eq(i).find('a').attr('href', '/'+currentUrlLang+_val)
+						}else{
+							$('.mobile-menu .mobile-menu-wrap li').eq(i).find('a').attr('target' , '_blank');
+						}
+					}
+					if(((currentUrlLang == 'de' || currentUrlLang == 'fr' || currentUrlLang == 'es-xl') && av.indexOf(_val) > -1) || ((_val == '/books/' || _val == '/invoice/') && currentUrlLang == 'pt-br')){
+						$('.mobile-menu .mobile-menu-wrap li').eq(i).find('a').attr('href', '/'+currentUrlLang+_val)
+					}
+				}
+			}
+		}
+	}
+	
+	resetLangUrl();
+	hederLang();
+});
+
+/* change href links as per the language End */
+
+function dropheight(){
+	var HArr = [];
+	var HCount = 0;
+	var devidCount = 0;
+	for(var i=0 ;i<$('.header .menu li').length; i++){
+		for(var j=1; j<$('.header .menu li .catagory-inner').eq(i).find('div').length; j++){
+			HArr[HCount] = ($('.header .menu li .catagory-inner').eq(i).find('div').eq(j).height())
+			HCount++;
+		}
+	}
+	var _maxVal = Math.max.apply(Math, HArr);
+	$('.app-box').css('height', _maxVal+'px')
+	
+	for(var j=1; j<$('.header .menu li .catagory-inner').eq(0).find('div').length; j++){
+		var aV = $('.header .menu li .catagory-inner').eq(0).find('div').eq(1).offset().top;
+		var bV = $('.header .menu li .catagory-inner').eq(0).find('div').eq(j).offset().top;
+		if(aV == bV){
+			devidCount++;
+		}
+	}
+	for(var i=0 ;i<$('.header .menu li').length; i++){
+		var _rowcount = (Math.ceil(($('.header .menu li .catagory-inner').eq(i).find('div').length-1)/devidCount));
+			var _height = (_maxVal*_rowcount)
+			if(_rowcount == 1){
+				_height = (_maxVal*2)
+			}
+			$('.header .menu li .catagory-inner').eq(i).find('div').eq(0).css('height', _height+'px')
+	}
+}
+
+/* Drop Down Height Fixing End*/
+	var intervalCount = 0;
+	function CheckelEment(){
+		var runintervl = setTimeout(function(){
+			if($('.zgdprform-countrylist-container').length > 0){
+				var gdprElm = document.createElement("script");
+				gdprElm.type = "text/javascript";
+				gdprElm.src = "https://www."+Zdomain+"."+domainOne+"/js/gdpr-compliance.js";
+				document.getElementsByTagName('head')[0].appendChild(gdprElm);
+				clearInterval(runintervl);
+			}else{
+				intervalCount++;
+				if(intervalCount < 25){
+					CheckelEment();
+				}
+			}
+		}, 500);
+	}
+	var intervalSignupCount = 0;
+	function CheckelEmentSignup(){
+		var runintervlSignup = setTimeout(function(){
+			if($('.signup-box form').length > 0){
+				if($('.za-captcha-container').length > 0){
+					$('.za-captcha-container').after('<div class="za-country-container za-country-container-arrow"> <select class="form-input countryCnt za-country-select globalcountrycode-signup" name="country" id="country" placeholder="Select Country" aria-invalid="false"></select> </div>');
+					//$('.za-country-container').hide();
+				}
+				
+				if($('.za-newsletter-container').length > 0){
+					var _txt = 'I would like to receive marketing communication from Zoho and Zoho\'s regional partners regarding Zoho\'s products, services, and events.'
+					if(typeof currentUrlLang != 'undefined'){
+						if(currentUrlLang == 'fr'){
+							_txt = 'J\'aimerais recevoir une communication marketing de Zoho et des partenaires régionaux de Zoho concernant les produits, services et événements de Zoho.';
+						}else if(currentUrlLang == 'de'){
+							_txt = 'Ich möchte von den regionalen Partnern von Zoho und Zoho Marketing-Kommunikation über die Produkte, Dienstleistungen und Veranstaltungen von Zoho erhalten.';
+						}else if(currentUrlLang == 'es-xl'){
+							_txt = 'Me gustaría recibir comunicaciones de marketing de los socios regionales de Zoho y Zoho sobre los productos, servicios y eventos de Zoho.';
+						}else if(currentUrlLang == 'pt-br'){
+							_txt = 'Eu gostaria de receber comunicações de marketing dos parceiros regionais de Zoho e Zoho sobre os produtos, serviços e eventos da Zoho.';
+						}else if(currentUrlLang == 'jp'){
+							_txt = 'Zoho&#12392;Zoho&#12398;&#12497;&#12540;&#12488;&#12490;&#12540;&#20225;&#26989;&#12363;&#12425;&#12289;Zoho&#12398;&#35069;&#21697;&#12289;&#12469;&#12540;&#12499;&#12473;&#12289;&#12452;&#12505;&#12531;&#12488;&#12395;&#38306;&#12377;&#12427;&#12510;&#12540;&#12465;&#12486;&#12451;&#12531;&#12464;&#24773;&#22577;&#12398;&#21463;&#12369;&#21462;&#12427;&#12371;&#12392;&#12395;&#21516;&#24847;&#12375;&#12414;&#12377;&#12290';
+						}
+					}
+		
+					$('.za-newsletter-container').html('<label for="newsletter" class="news-signup sign_agree"> <input tabindex="1" class="za-newsletter" type="checkbox" id="newsletter" name="newsletter" value="true" onclick="toggleNewsletterField()"> <span class="icon-medium unchecked" id="signup-newsletter"></span> <span>'+_txt+'</span> </label>');
+					$('.za-newsletter-container').css('display','none');
+				}
+				var gdprElm = document.createElement("script");
+				gdprElm.type = "text/javascript";
+				gdprElm.src = "https://www."+Zdomain+"."+domainOne+"/js/gdpr-compliance-signup.js";
+				document.getElementsByTagName('head')[0].appendChild(gdprElm);
+				clearInterval(runintervlSignup);
+			}else{
+				intervalSignupCount++;
+				if(intervalSignupCount < 25){
+					CheckelEmentSignup();
+				}
+			}
+		}, 100);
+	}
+$(document).ready(function(){
+	if(typeof CheckelEment == 'function'){
+		CheckelEment();
+	}
+	if(typeof CheckelEmentSignup == 'function'){
+		CheckelEmentSignup();
+	}
+});
+
+/* Access button click */
+$(document).on("click",".umain .cta-btn.logged-in, .userinfo-details .userinfo-access",function(e) {
+	if($(this).attr('href').indexOf("_ga")){
+	 e.preventDefault();
+	 window.location=$(this).attr('href').split('?_ga')[0];
+	}
+});
+
+
+/***********Dropdown Starts***********/
+function dropEqualHei() {
+    var wW = $(window).width();
+    if (wW > 767) {
+        $('.dropdown ul').css({ 'height': '', 'width': '' });
+        $('.dropdown').each(function() {
+            var that = $(this);
+            var widInnerSub = 0;
+            that.find('.sub-dropdown').each(function() {
+                var thatChild = $(this);
+                thatChild.find('> li > a').each(function() {
+                    var thatInnerChild = $(this);
+                    if (thatInnerChild.innerWidth() > widInnerSub) {
+                        widInnerSub = thatInnerChild.innerWidth();
+                    }
+                });
+            });
+            that.find('.sub-dropdown').css({ 'width': widInnerSub });
+            that.find('.dropdown-menu').each(function() {
+                var thatChild = $(this);
+                var wid = 0;
+                thatChild.find('> li > a').each(function() {
+                    var thatInnerChild = $(this);
+                    if (thatInnerChild.innerWidth() > wid) {
+                        wid = thatInnerChild.innerWidth();
+                    }
+                });
+                thatChild.css({ 'width': wid });
+            });
+            var hei = 0;
+            that.find('ul').each(function() {
+                var thatChild = $(this);
+                if (thatChild.height() > hei) {
+                    hei = thatChild.height();
+                }
+            });
+            that.find('ul').css({ 'height': hei });
+        });
+    } else {
+        $('.dropdown ul').css({ 'height': '', 'width': '' });
+    }
+}
+
+function dropRight() {
+    var wW = $(window).width();
+    if (wW > 767) {
+        $('.dropdown-menu').each(function() {
+            var element = $(this);
+            var offRight = (wW - (element.offset().left + element.outerWidth()));
+            if (offRight < 20) {
+                element.closest('.dropdown').addClass('dropdown-right');
+            }
+        });
+        $('.sub-dropdown').each(function() {
+            var element = $(this);
+            var offRight = (wW - (element.offset().left + element.outerWidth()));
+            if (offRight < 20) {
+                element.closest('.dropdown').addClass('subdropdown-right');
+            }
+        });
+    }
+}
+
+function productMenuEvents() {
+    var wW = $(window).width();
+    if (wW > 767) {
+        $('.dropdown,.hamburger-box').removeClass('active');
+        $('.dropdown-menu').removeAttr('style');
+        $(document).off('touchstart click', '.dropdown > a,.dropdown > span');
+        if (navigator.userAgent.match(/(iPhone|iPod|iPad)/i)) {
+            var selectEvents = (function() {
+                if ('ontouchstart' in document.documentElement === true)
+                    return 'touchstart';
+                else
+                    return 'click';
+            })();
+            $(document).on(selectEvents, '.dropdown > span,.dropdown > a', function(e) {
+                e.stopImmediatePropagation();
+                var that = $(this);
+                if (!that.parent().hasClass('active')) {
+                    $('.dropdown').removeClass('dropdown-right subdropdown-right');
+                    $('.dropdown,.dropdown-menu li,.sub-dropdown').removeClass('active');
+                    $('.sub-dropdown li').removeAttr('style');
+                    that.parent().addClass('active');
+                    dropRight();
+                } else {
+                    $('.dropdown').removeClass('dropdown-right subdropdown-right');
+                    $('.dropdown,.dropdown-menu li,.sub-dropdown').removeClass('active');
+                    $('.sub-dropdown li').removeAttr('style');
+                }
+                return false;
+            });
+        } else {
+            $(document).on('mouseenter', '.dropdown', function(e) {
+                e.stopImmediatePropagation();
+                var that = $(this);
+                that.addClass('active');
+                dropRight();
+            });
+            $(document).on('mouseleave', '.dropdown', function(e) {
+                e.stopImmediatePropagation();
+                var that = $(this);
+                that.removeClass('active');
+                $('.dropdown-menu li,.sub-dropdown').removeClass('active');
+                $('.sub-dropdown li').removeAttr('style');
+                $('.dropdown').removeClass('dropdown-right subdropdown-right');
+            });
+        }
+        var trans = 0;
+        $(document).on('mouseenter touchstart', '.dropdown-menu > li', function(e) {
+            e.stopImmediatePropagation();
+            var that = $(this);
+            $('.dropdown-menu li,.sub-dropdown').removeClass('active');
+            $('.sub-dropdown li').removeAttr('style');
+            that.addClass('active');
+            that.find('.sub-dropdown').addClass('active');
+            that.find('.sub-dropdown li').each(function() {
+                var thatElm = $(this);
+                thatElm.css('transition-delay', trans + 'ms');
+                trans = trans + 100;
+            });
+            trans = 0;
+        });
+      if(! /Android|webOS|iPhone|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+        $(document).on('touchstart click', function(e) {
+            var container = $('.dropdown');
+            if (!container.is(e.target) && container.has(e.target).length === 0) {
+                $('.dropdown,.dropdown-menu li,.sub-dropdown').removeClass('active');
+                $('.sub-dropdown li').removeAttr('style');
+                $('.dropdown').removeClass('dropdown-right subdropdown-right');
+            }
+        });
+      }
+    } else {
+        $(document).off('mouseenter', '.dropdown');
+        $(document).off('mouseleave', '.dropdown');
+        $(document).off('mouseenter touchstart', '.dropdown-menu > li');
+        $('.dropdown,.hamburger-box').removeClass('active');
+        $('.dropdown-menu,.sub-dropdown').removeAttr('style');
+		var selectEvents = (function() {
+			if ('ontouchstart' in document.documentElement === true)
+				return 'touchstart';
+			else
+				return 'click';
+		})();
+        $(document).on(selectEvents, '.dropdown > a,.dropdown > span', function(e) {
+            e.stopImmediatePropagation();
+            var that = $(this);
+            if (!that.next().is(':visible')) {
+                $('.dropdown').removeClass('active');
+                $('.dropdown-menu').slideUp();
+                that.next().slideDown();
+                that.parent().addClass('active');
+            }
+			else{
+			    $('.dropdown').removeClass('active');
+                $('.dropdown-menu').slideUp();	
+			}
+			return false;
+        });
+    }
+}
+$(document).ready(function() {
+    $('.mobile-menu-icon').on('click', function() {
+        var that = $(this);
+        if(that.find('.hamburger-box').hasClass('active')){
+            that.find('.hamburger-box').removeClass('active');
+            $('.dropdown').removeClass('active');
+            $('.dropdown-menu').removeAttr('style');
+        }
+        else{
+            that.find('.hamburger-box').addClass('active');
+        }
+    });
+    $('.mobile-menu-icon').append('<span class="hamburger-box"><span></span><span></span><span></span><span></span><span></span><span></span></span>');
+    dropEqualHei();
+    productMenuEvents();
+});
+var mobileWidth = $(window).width();
+$(window).on('resize', function() {
+    dropEqualHei();
+	if ($(window).width() != mobileWidth) {
+		 productMenuEvents();
+	     mobileWidth = $(window).width();  
+	}
+});
+$(window).on('load', function() {
+    dropEqualHei();
+});
+/***********Dropdown Ends***********/
+
+
+
+/********** pricing Code  *************/
+
+$(document).ready(function(e) {
+    //HTML <span data-common-zprice="USD;INR;EUR;GBP;JPY;AUD;SGD//1;2;3;4;5;6;7"></span>
+    //Call displayZPricing() if needed from node JS
+    displayZPricing();
+});
+
+function displayZPricing() {
+    $("span[data-common-zprice]").each(function(index, element) {
+        var pricingCurrencyList = $(this).attr('data-common-zprice').split("//")[0].split(";");
+        var pricingAmountList = $(this).attr('data-common-zprice').split("//")[1].split(";");
+        var currentCurrencyIndex = pricingCurrencyList.indexOf("USD");
+        var zpricingCurrencySym = "&#x24;";
+        var zpricingAmountVal = pricingAmountList[currentCurrencyIndex];
+
+        if (domainOne == "eu") {
+            if (CountryCode == "GB" && $.inArray("GBP", pricingCurrencyList) > -1) {
+                currentCurrencyIndex = pricingCurrencyList.indexOf("GBP");
+                zpricingCurrencySym = "&#xa3;";
+                zpricingAmountVal = pricingAmountList[currentCurrencyIndex];
+            } else if ($.inArray("EUR", pricingCurrencyList) > -1) {
+                currentCurrencyIndex = pricingCurrencyList.indexOf("EUR");
+                zpricingCurrencySym = "&#x20AC;";
+                zpricingAmountVal = pricingAmountList[currentCurrencyIndex];
+            }
+        } else {
+            if (CountryCode == "IN" && $.inArray("INR", pricingCurrencyList) > -1) {
+                currentCurrencyIndex = pricingCurrencyList.indexOf("INR");
+                zpricingCurrencySym = "&#x20B9;";
+                zpricingAmountVal = pricingAmountList[currentCurrencyIndex];
+            } else if (CountryCode == "AU" && $.inArray("AUD", pricingCurrencyList) > -1) {
+                currentCurrencyIndex = pricingCurrencyList.indexOf("AUD");
+                zpricingCurrencySym = "A&#x24;";
+                zpricingAmountVal = pricingAmountList[currentCurrencyIndex];
+            } else if (CountryCode == "SG" && $.inArray("SGD", pricingCurrencyList) > -1) {
+                currentCurrencyIndex = pricingCurrencyList.indexOf("SGD");
+                zpricingCurrencySym = "S&#x24;";
+                zpricingAmountVal = pricingAmountList[currentCurrencyIndex];
+            } else if (CountryCode == "JP" && $.inArray("JPY", pricingCurrencyList) > -1) {
+                currentCurrencyIndex = pricingCurrencyList.indexOf("JPY");
+                zpricingCurrencySym = "&#xa5;";
+                zpricingAmountVal = pricingAmountList[currentCurrencyIndex];
+            }
+        }
+
+        $(this).addClass('zprice-container').attr('id', 'zprice-container' + (index + 1));
+        $(this).html('<span class="zprice-currency">' + zpricingCurrencySym + '</span><span class="zprice-amount">' + zpricingAmountVal + '</span>');
+    });
+}
+
+/********** pricing Code End *************/
+
+ $(document).ready(function () {
+	function czonevideoModal() {
+		if ($('.zcpopup-controller').length > 0) {
+			var videoTemplate =
+				'<div class="zc-video-modal"><a href="javascript:;" class="zc-video-close"></a><div class="zc-video-modalInner"><div class="zc-video-container"><div class="zc-video-box"></div></div></div></div>';
+			$('body').append(videoTemplate);
+		}
+		$(document).on('click', '.zcpopup-controller', function (e) {
+			e.preventDefault()
+			var videoURL = $(this).data('video');
+			var videoControl = "?rel=0&autoplay=1&showinfo=0&autohide=1";
+			if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator
+					.userAgent)) {
+				window.open(videoURL + videoControl, '_blank');
+			} else {
+				$('body').addClass('zclock');
+				$('.zc-video-modal').fadeIn();
+				$('.zc-video-box').append('<iframe src="' + videoURL + videoControl +
+					'" frameborder="0" allowfullscreen="" class="zc-video-iframe"></iframe>'
+				);
+				setTimeout(function () {
+					$('.zc-video-modal').addClass('click-out');
+				}, 500);
+			}
+			return false;
+		});
+		function vidClose(){
+			$('.zc-video-modal').fadeOut();
+			$('body').removeClass('zclock');
+			$('.zc-video-iframe').remove();
+			$('.zc-video-modal').removeClass('click-out');
+		}
+		$(document).on('click', '.zc-video-close', function () {
+			vidClose()
+		});
+		$(document).on('click', '.click-out', function () {
+			vidClose()
+		});
+		$(document).keyup(function (e) {
+			if (e.keyCode === 27) {
+				vidClose()
+			}
+		});
+	}
+	czonevideoModal();
+});
