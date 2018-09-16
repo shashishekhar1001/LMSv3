@@ -19,11 +19,13 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 
-from . import views as SRC_views
+# from . import views as SRC_views
+from SRC import views as SRC_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', SRC_views.home, name='home')
+    path(r'', SRC_views.home, name='home'),
+    path(r'thankyou/', SRC_views.thankyou, name='thankyou')
 ]
 
 if settings.DEBUG:

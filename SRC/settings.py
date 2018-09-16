@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'registration',
     'lms',
     # Third Party Apps
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,7 @@ STATICFILES_DIRS = (
 MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "static", "media_root")
+
+
+# Crispy form settings
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
