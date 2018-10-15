@@ -137,3 +137,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "static", "media_root")
 
 # Crispy form settings
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+CHAT_DATA = os.path.join(BASE_DIR, "chat_data")

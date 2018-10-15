@@ -21,11 +21,17 @@ from django.conf.urls.static import static
 
 # from . import views as SRC_views
 from SRC import views as SRC_views
+from registration import views as reg_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path(r'', SRC_views.home, name='home'),
-    path(r'thankyou/', SRC_views.thankyou, name='thankyou')
+    path(r'thankyou/', SRC_views.thankyou, name='thankyou'),
+    path(r'signup/', reg_views.custom_user_creation, name='custom_user_creation'),
+    path(r'activation_mail_sent/', reg_views.activation_mail_sent, name='activation_mail_sent'),
+    path(r'already_registered/', reg_views.already_registered, name='already_registered'),
+    path(r'activation_pending/', reg_views.activation_pending, name='activation_pending'),
+    path(r'account_active/', reg_views.account_active, name='account_active'),
 ]
 
 if settings.DEBUG:

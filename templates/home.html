@@ -163,17 +163,17 @@
                     <ul id="nav" class="nav navbar-nav">
                         <li class="current"><a href="#body">Home</a></li>
                         <li><a href="#about">About Us</a></li>
-                        <li><a href="#services">Services</a></li>
+                        <li><a href="#services">Features</a></li>
                         <!-- <li><a href="#showcase">Portfolio</a></li> -->
                         <!-- <li><a href="#our-team">Team</a></li> -->
-                        <li><a href="#pricing">Pricing</a></li>
+                        <!-- <li><a href="#pricing">Pricing</a></li> -->
                         <!-- <li><a href="#blog">Blog</a></li> -->
                         <li><a href="#contact-us">Contact</a></li>
                         {% if request.user.is_authenticated %}
-                        <li><a href="/registration/logout/">Logout</a></li>
+                        <li><a href="/logout/">Logout</a></li>
                         {% else %}
-                        <li><a href="/registration/register/">Register</a></li>
-                        <li><a href="/registration/login/">Login</a></li>
+                        <li><a href="/signup/">Register</a></li>
+                        <li><a href="/login/">Login</a></li>
                         {% endif %}
                     </ul>
                 </nav>
@@ -272,8 +272,7 @@
 									<h3>Main Features of El-Djangoista</h3>
 									<p>Managing a Training Institute or an University is a complex and time consuming task if not managed properly. Our aim is to exactly do the same in an efficient and less time consuming manner with an availability of wide variety of features.</p>
 									<p>The end result is the person trying to attain the skills from the trainer is happy and satisfied.</p>
-									<a href="#" class="btn btn-transparent">Learn More</a>
-									<a href="#" class="btn btn-transparent">Purchase Theme</a>
+									
 								</div>
 								<!-- /features content -->
 								
@@ -285,7 +284,7 @@
 							
 								<!-- features media -->
 								<div class="col-md-6 feature-media wow fadeInUp" data-wow-duration="500ms">
-									<img src="img/blog/3D-beach-art.jpg" alt="3D Beach Art | Meghna" class="img-responsive">
+									<img src="/static/img/portfolio/wide-port1.jpg" alt="3D Beach Art | Meghna" class="img-responsive">
 								</div>
 								<!-- /features media -->
 								
@@ -294,8 +293,7 @@
 									<h3>Main Features of El-Djangoista</h3>
 									<p>The trainers can easily create a course content module wise along with it's resources. Also they can create a quiz for each module and evaluate the performance of the students. Can restructure the modules by just drag-n-drop.</p>
 									<p>The students can access the subscribed courses only and give quizes for that course to evaluate themselves. Also they get an inspiration by seeing themselves on the leaderborad for that course.</p>
-									<a href="#" class="btn btn-transparent">Learn More</a>
-									<a href="#" class="btn btn-transparent">Purchase Theme</a>
+									
 								</div>
 								<!-- /features content -->
 								
@@ -848,147 +846,7 @@
 			</div>   	
 		</section>    -->
 		
-		
-		
-		<!-- Start Pricing section
-		=========================================== -->
-		
-		<section id="pricing" class="bg-one">
-			<div class="container">
-				<div class="row">
-					
-					<!-- section title -->
-				    <div class="title text-center wow fadeInDown" data-wow-duration="500ms">
-			        	<h2>Our Greatest<span class="color"> Plans</span></h2>
-				        <div class="border"></div>
-				    </div>
-				    <!-- /section title -->
-					
-					<!-- single pricing table -->
-					<article class="col-md-3 col-sm-6 col-xs-12 text-center wow fadeInUp" data-wow-duration="200ms">
-						<div class="pricing">
-							
-							<!-- plan name & value -->
-							<div class="price-title">
-								<h3>Starter</h3>
-								<p>From <strong class="value">$49</strong> month</p>
-							</div>
-							<!-- /plan name & value -->
-							
-							<!-- plan description -->
-							<ul>
-								<li>5GB Disk Space</li>
-								<li>Unlimited Users</li>
-								<li>Unlimited Courses</li>
-								<li>3GB CPU</li>
-								<li>Low Bandwidth</li>
-								<li>24/7 Tech Support</li>
-							</ul>
-							<!-- /plan description -->
-							
-							<!-- signup button -->
-							<a class="btn btn-transparent" href="#">Signup</a>
-							<!-- /signup button -->
-							
-						</div>
-					</article>
-					<!-- end single pricing table -->
-					
-					<!-- single pricing table -->
-					<article class="col-md-3 col-sm-6 col-xs-12 text-center wow fadeInUp" data-wow-duration="500ms" data-wow-delay="400ms">
-						<div class="pricing">
-						
-							<!-- plan name & value -->
-							<div class="price-title">
-								<h3>Silver</h3>
-								<p>From <strong class="value">$99</strong> month</p>
-							</div>
-							<!-- /plan name & value -->
-							
-							<!-- plan description -->
-							<ul>
-								<li>15 GB Disk Space</li>
-								<li>Unlimited Users</li>
-								<li>Unlimited Courses</li>
-								<li>7GB CPU</li>
-								<li>Normal Bandwidth</li>
-								<li>24/7 Tech Support</li>
-							</ul>
-							<!-- /plan description -->
-							
-							<!-- signup button -->
-							<a class="btn btn-transparent" href="#">Signup</a>
-							<!-- /signup button -->
-							
-						</div>
-					</article>
-					<!-- end single pricing table -->
-					
-					<!-- single pricing table -->
-					<article class="col-md-3 col-sm-6 col-xs-12 text-center wow fadeInUp" data-wow-duration="500ms" data-wow-delay="600ms">
-						<div class="pricing">
-							
-							<!-- plan name & value -->
-							<div class="price-title">
-								<h3>Gold</h3>
-								<p>From <strong class="value">$199</strong> month</p>
-							</div>
-							<!-- /plan name & value -->
-							
-							<!-- plan description -->
-							<ul>
-								<li>25GB Disk Space</li>
-								<li>Unlimited Users</li>
-								<li>Unlimited Courses</li>
-								<li>14GB CPU</li>
-								<li>High Bandwidth</li>
-								<li>24/7 Tech Support</li>
-							</ul>
-							<!-- /plan description -->
-							
-							<!-- signup button -->
-							<a class="btn btn-transparent" href="#">Signup</a>
-							<!-- /signup button -->
-							
-						</div>
-					</article>
-					<!-- end single pricing table -->
-					
-					<!-- single pricing table -->
-					<article class="col-md-3 col-sm-6 col-xs-12 text-center wow fadeInUp" data-wow-duration="500ms" data-wow-delay="750ms">
-						<div class="pricing kill-margin-bottom">
-						
-							<!-- plan name & value -->
-							<div class="price-title">
-								<h3>Platinum</h3>
-								<p>From <strong class="value">$299</strong> month</p>
-							</div>
-							<!-- /plan name & value -->
-							
-							<!-- plan description -->
-							<ul>
-								<li>55GB Disk Space</li>
-								<li>Unlimited Users</li>
-								<li>Unlimited Courses</li>
-								<li>28GB CPU</li>
-								<li>Very High Bandwidth</li>
-								<li>24/7 Tech Support</li>
-							</ul>
-							<!-- /plan description -->
-							
-							<!-- signup button -->
-							<a class="btn btn-transparent" href="#">Signup</a>
-							<!-- /signup button -->
-							
-						</div>
-					</article>
-					<!-- end single pricing table -->
-				    
-					
-				</div>       <!-- End row -->
-			</div>   	<!-- End container -->
-		</section>   <!-- End section -->
-		
+	
 		
 		<!-- Start Testimonial
 		=========================================== -->

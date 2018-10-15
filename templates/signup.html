@@ -11,7 +11,7 @@
         
         <meta name="author" content="Shashishekhar Hasabnis">
 		
-        <title>El-Djangoista | Thanks</title>
+        <title>El-Djangoista | Signup</title>
 		
 		<!-- Mobile Specific Meta
 		================================================== -->
@@ -88,7 +88,7 @@
                         {% if request.user.is_authenticated %}
                         <li><a href="/logout/">Logout</a></li>
                         {% else %}
-                        <li><a href="/signup/">Register</a></li>
+                        <!-- <li><a href="/registration/register/">Register</a></li> -->
                         <li><a href="/login/">Login</a></li>
                         {% endif %}
                     </ul>
@@ -107,17 +107,20 @@
 		<section id="contact-us">
 			<div class="container">
 				<div class="row">
-					
 					<!-- section title -->
 					<div class="title text-center wow fadeIn" data-wow-duration="500ms">
-						<h2>Thank <span class="color">You</span></h2>
+						<h2>Sign <span class="color">Up</span></h2>
 						<div class="border"></div>
 					</div>
 					<!-- /section title -->
 							
 					<!-- Contact Form -->
-					<div class="contact-form col-sm-12 wow fadeInUp" data-wow-duration="500ms" data-wow-delay="300ms">
-                        <h4 class="text-center">Thanks for reaching out to us. We will get back to you soon.</h4>
+					<div class="contact-form col-md-12 wow fadeInUp" data-wow-duration="500ms" data-wow-delay="300ms">
+                        <form id="contact-form" method="post" action="">
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            <input type="submit" value="Submit" class="btn btn-success">
+                        </form>
 					</div>
 					<!-- ./End Contact Form -->
 				
