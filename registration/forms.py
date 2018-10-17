@@ -15,3 +15,8 @@ class CommonRegistrationForm(forms.Form):
         # ('Job Seeker', 'Job Seeker'),
     )
     register_as = forms.ChoiceField(choices=REGISTRATION_CHOICES, widget=forms.Select, required=True, label='Register As')
+
+
+class LoginForm(forms.Form):
+    email = forms.EmailField(required=True, label="Email", validators=[invalid_email])  
+    password = forms.CharField(widget=forms.PasswordInput, required=True)

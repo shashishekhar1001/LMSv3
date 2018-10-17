@@ -3,7 +3,22 @@
 {% load crispy_forms_tags %}
 
 
-{% block 'title' %}SIGNUP{% endblock %}
+{% block 'title' %}LOGIN{% endblock %}
+
+
+{% block 'navbar' %}
+	<nav class="collapse navbar-collapse navbar-right" role="Navigation">
+		<ul id="nav" class="nav navbar-nav">
+			<li class="current"><a href="/">Home</a></li>
+			{% if request.user.is_authenticated %}
+				<li><a href="/logout/">Logout</a></li>
+			{% else %}
+				<li><a href="/signup/">Register</a></li>
+			{% endif %}
+		</ul>
+	</nav>
+{% endblock %}
+
 
 {% block 'content' %}
 		
@@ -12,7 +27,7 @@
 			<div class="row">
 				<!-- section title -->
 				<div class="title text-center wow fadeIn" data-wow-duration="500ms">
-					<h2>Sign <span class="color">Up</span></h2>
+					<h2>LOG <span class="color">IN</span></h2>
 					<div class="border"></div>
 				</div>
 				<!-- /section title -->

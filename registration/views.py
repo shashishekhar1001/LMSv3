@@ -1,6 +1,7 @@
 from django.core import signing
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponseRedirect, HttpResponse
@@ -60,11 +61,14 @@ def custom_user_creation(request):
             # settings.EMAIL_HOST_USER,
             # [u.email], 
             # fail_silently=False)
-            # send_mail('Click the link below to activate yor Account for ' + "localhost:8080", 
-            # "http://" + "localhost:8080" +'/authentication/activate_user/?ak=' + ak, 
-            # settings.EMAIL_HOST_USER,
-            # [u.email], 
-            # fail_silently=False)
+            send_mail('Click the link below to activate yor Account for ' + "localhost:8080", 
+            "http://" + "localhost:8080" +'/authentication/activate_user/?ak=' + ak, 
+            settings.EMAIL_HOST_USER,
+            [u.email], 
+            fail_silently=False)
+            activation_link = "http://" + "localhost:8080" +'/authentication/activate_user/?ak=' + ak
+            print(activation_link)
+            print("\n"*20)
             return HttpResponseRedirect('/activation_mail_sent')
         context = {"form": form}
     return render(request, "signup.html", context)
@@ -88,5 +92,88 @@ def activation_pending(request):
     return render(request, "activation_pending.html", {})
 
 
+
+def activation_failed(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect('/account_active')
+    return render(request, "activation_failed.html", {})
+
+
+def activation_complete(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect('/account_active')
+    return render(request, "activation_complete.html", {})
+
+
 def account_active(request):
     return render(request, "account_active.html", {})
+
+
+def activate_user(request):
+    salt = settings.SECRET_KEY
+    ak = request.GET.get('ak')
+    # Change below line max_age according to your settings.py file
+    decrypt = signing.loads(ak, salt)
+    u = User.objects.get(email=decrypt)
+    try:
+        if u.is_active == False:    
+            u.is_active = True
+            u.save()
+            return HttpResponseRedirect('/activation_complete/')
+        else:
+            return HttpResponseRedirect('/account_active/')
+    except:
+        return HttpResponseRedirect('/activation_failed/')
+
+
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect("/")
+
+
+def my_login(request):
+    try:
+        next = request.GET.get('next')
+        if next:
+            print(next)
+        else:
+            print("no next") 
+    except Exception as e:
+        print(e)
+    form = LoginForm(request.POST or None)
+    context ={"form":form}
+    if form.is_valid():
+        email = form.cleaned_data.get('email')
+        password = form.cleaned_data.get('password')
+        try:
+            user = User.objects.get(email=email) 
+            username = user.username
+            user = authenticate(username=username, password=password)
+        except:
+            raise forms.ValidationError('User not found')
+        if user is not None:
+            if user.is_active:
+                login(request, user)
+                try:
+                    custom_user = Custom_User.objects.get(user = user)
+                except:
+                    return HttpResponseRedirect('/signup/')
+                try:
+                    if custom_user is not None:
+                        if str(custom_user.primary_registration_type) == str("Trainer"):
+                            if next:
+                                return HttpResponseRedirect(next) 
+                            return HttpResponseRedirect('/trainer_dashboard/')
+                        if str(custom_user.primary_registration_type) == str("Learner"):
+                            if next:
+                                return HttpResponseRedirect(next)       
+                            return HttpResponseRedirect('/learner_dashboard/')
+                except Exception as e:
+                    print(e)
+            else:
+                return HttpResponseRedirect('/activation_pending/')
+            return HttpResponseRedirect('/')
+        else:
+            messages.error(request, 'Incorrect Password.')
+            context ={"form":form}      
+    return render(request, "login.html", context)
