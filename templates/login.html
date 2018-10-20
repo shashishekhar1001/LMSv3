@@ -5,6 +5,30 @@
 
 {% block 'title' %}LOGIN{% endblock %}
 
+{% block 'head' %}
+<style>
+	.alert {
+		padding: 20px;
+		background-color: #f44336;
+		color: white;
+	}
+	
+	.closebtn {
+		margin-left: 15px;
+		color: white;
+		font-weight: bold;
+		float: right;
+		font-size: 22px;
+		line-height: 20px;
+		cursor: pointer;
+		transition: 0.3s;
+	}
+	
+	.closebtn:hover {
+		color: black;
+	}
+</style>
+{% endblock %}
 
 {% block 'navbar' %}
 	<nav class="collapse navbar-collapse navbar-right" role="Navigation">
@@ -34,6 +58,12 @@
 						
 				<!-- Contact Form -->
 				<div class="contact-form col-md-12 wow fadeInUp" data-wow-duration="500ms" data-wow-delay="300ms">
+					{% for message in messages %}
+						<div class="alert">
+							<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+							<strong>ERROR!</strong> {{ message }}
+						</div>
+					{% endfor %}
 					<form id="contact-form" method="post" action="">
 						{% csrf_token %}
 						{{ form|crispy }}

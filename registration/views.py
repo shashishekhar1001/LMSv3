@@ -1,7 +1,9 @@
 from django.core import signing
 from django.core.exceptions import ValidationError
 from django.conf import settings
+from django.contrib import messages 
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
 from django.http import HttpResponseRedirect, HttpResponse
@@ -174,6 +176,8 @@ def my_login(request):
                 return HttpResponseRedirect('/activation_pending/')
             return HttpResponseRedirect('/')
         else:
-            messages.error(request, 'Incorrect Password.')
+            messages.error(request, 'Invalid password supplied.')
             context ={"form":form}      
     return render(request, "login.html", context)
+
+

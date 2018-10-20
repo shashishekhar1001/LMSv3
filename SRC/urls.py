@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 # from . import views as SRC_views
 from SRC import views as SRC_views
 from registration import views as reg_views
+from lms import views as lms_views
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
@@ -41,7 +42,9 @@ urlpatterns = [
     path(r'password_reset/', auth_views.password_reset, name='password_reset'),
     path(r'password_reset/done/', auth_views.password_reset_done, name='password_reset_done'),
     path(r'reset/done/', auth_views.password_reset_complete, name='password_reset_complete'),
-    path(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.password_reset_confirm, name='password_reset_confirm')
+    path(r'dashboard_base/', lms_views.dashboard_base, name='dashboard_base'),
+    path(r'not_a_trainer/', lms_views.not_a_trainer, name='not_a_trainer'),
+    re_path(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.password_reset_confirm, name='password_reset_confirm')
 ]
 
 if settings.DEBUG:
