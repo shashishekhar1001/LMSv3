@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'lms',
     # Third Party Apps
     'crispy_forms',
+    'django_cleanup',
+    'widget_tweaks',
 ]
 
 MIDDLEWARE = [

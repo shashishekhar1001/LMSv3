@@ -10,9 +10,9 @@ class UpdateTrainerProfileForm(forms.Form):
     city = forms.CharField(max_length=30, required=True)
     state = forms.CharField(max_length=30, required=True)
     country = forms.CharField(max_length=30, required=True)
-    profile_picture = forms.ImageField(required=True)
+    profile_picture = forms.ImageField(required=False)
     describe_yourself = forms.CharField(required=True, widget=forms.Textarea)
     linked_in_url = forms.URLField(required=True)
     skills = forms.CharField(required=True, widget=forms.Textarea)
-    cv = forms.FileField(required=True)
+    cv = forms.FileField(required=False)
 

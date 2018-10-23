@@ -37,13 +37,13 @@
       </div>
       <div class="sidebar-wrapper">
         <ul class="nav">
+          {% block 'side_bar' %}
           <li class="nav-item active  ">
             <a class="nav-link" href="">
               <i class="material-icons">dashboard</i>
               <p>Dashboard</p>
             </a>
           </li>
-          {% block 'side_bar' %}
           {% endblock %}
         </ul>
       </div>

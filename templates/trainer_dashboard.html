@@ -1,0 +1,148 @@
+{% extends 'dashboard_base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+
+{% block 'title' %} Trainer {% endblock %}
+
+{% block 'side_bar' %}
+<li class="nav-item active">
+    <a class="nav-link" href="/trainer_dashboard/">
+      <i class="material-icons">dashboard</i>
+      <p>Dashboard</p>
+    </a>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="/trainer_update_profile/">
+        <i class="material-icons">person_add</i>
+        <p>Update Profile</p>
+    </a>
+</li>
+{% endblock %}
+
+{% block 'dashboard_title' %} Trainer {% endblock %}
+
+{% block 'content' %}
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="card card-stats">
+                <div class="card-header card-header-warning card-header-icon">
+                    <div class="card-icon">
+                    <i class="material-icons">content_copy</i>
+                    </div>
+                    <p class="card-category">My Courses</p>
+                    <h3 class="card-title">5    
+                    </h3>
+                </div>
+                <div class="card-footer">
+                    <div class="stats">
+                    <i class="material-icons text-danger">create</i>
+                    <a>Total courses created.</a>
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="card card-stats">
+                <div class="card-header card-header-info card-header-icon">
+                    <div class="card-icon">
+                    <i class="material-icons">extension</i>
+                    </div>
+                    <p class="card-category">Total Modules</p>
+                    <h3 class="card-title">245</h3>
+                </div>
+                <div class="card-footer">
+                    <div class="stats">
+                    <i class="material-icons text-danger">view_module</i> Total modules created.
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="card card-stats">
+                <div class="card-header card-header-success card-header-icon">
+                    <div class="card-icon">
+                    <i class="material-icons">touch_app</i>
+                    </div>
+                    <p class="card-category">Subscriptions</p>
+                    <h3 class="card-title">34,245</h3>
+                </div>
+                <div class="card-footer">
+                    <div class="stats">
+                    <i class="material-icons text-danger">subscriptions</i> Subscribers to Courses
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 col-sm-6">
+                <div class="card card-stats">
+                <div class="card-header card-header-danger card-header-icon">
+                    <div class="card-icon">
+                    <i class="material-icons">grade</i>
+                    </div>
+                    <p class="card-category">Avg. Ratings</p>
+                    <h3 class="card-title">3.5 / 5</h3>
+                </div>
+                <div class="card-footer">
+                    <div class="stats">
+                    <i class="material-icons text-danger">stars</i> Average Ratings Provided
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card card-chart">
+                    <div class="card-header card-header-danger">
+                        <div class="ct-chart" id="completedTasksChart"></div>
+                    </div>
+                    <div class="card-body">
+                        <h4 class="card-title">Todays Subscriptions</h4>
+                        <p class="card-category">Subscriptions done today.</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="stats">
+                        <!-- <i class="material-icons">access_time</i> campaign sent 2 days ago -->
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-chart">
+                    <div class="card-header card-header-success">
+                        <div class="ct-chart" id="dailySalesChart"></div>
+                    </div>
+                    <div class="card-body">
+                        <h4 class="card-title">Daily Subscribers</h4>
+                        <p class="card-category">
+                        Subscriptions this week.</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="stats">
+                        <!-- <i class="material-icons">access_time</i> updated 4 minutes ago -->
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-chart">
+                    <div class="card-header card-header-warning">
+                        <div class="ct-chart" id="websiteViewsChart"></div>
+                    </div>
+                    <div class="card-body">
+                        <h4 class="card-title">Monthly Subscriptions</h4>
+                        <p class="card-category">Subscriptions for this year.</p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="stats">
+                        <!-- <i class="material-icons">access_time</i> campaign sent 2 days ago -->
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

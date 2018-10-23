@@ -44,6 +44,8 @@ urlpatterns = [
     path(r'reset/done/', auth_views.password_reset_complete, name='password_reset_complete'),
     path(r'dashboard_base/', lms_views.dashboard_base, name='dashboard_base'),
     path(r'not_a_trainer/', lms_views.not_a_trainer, name='not_a_trainer'),
+    path(r'trainer_dashboard/', lms_views.trainer_dashboard, name='trainer_dashboard'),
+    path(r'trainer_update_profile/', lms_views.trainer_update_profile, name='trainer_update_profile'),
     re_path(r'^reset/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$', auth_views.password_reset_confirm, name='password_reset_confirm')
 ]
 

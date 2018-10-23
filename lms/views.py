@@ -1,10 +1,12 @@
 from django.shortcuts import render
+from django.contrib import messages 
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
+from django.forms.models import model_to_dict
 from registration.models import Custom_User, Trainer_Model
 from lms.forms import UpdateTrainerProfileForm
 
-# Create your views here.
+
 @login_required(login_url='/login/', redirect_field_name='next')
 def trainer_update_profile(request):
     user = request.user
@@ -13,36 +15,35 @@ def trainer_update_profile(request):
     cu = Custom_User.objects.get(user=user)
     if cu.primary_registration_type == "Trainer":
         trainer = Trainer_Model.objects.get(user=cu)
-        form = UpdateTrainerProfileForm(request.POST, request.FILES or None)
-        context = {"form": form}
-        if form.is_valid():
-            instance = form
-            city = instance.cleaned_data.get('city')
-            state = instance.cleaned_data.get('state')
-            country = instance.cleaned_data.get('country')
-            profile_picture = instance.cleaned_data.get('profile_picture')
-            describe_yourself = instance.cleaned_data.get('describe_yourself')
-            linked_in_url = instance.cleaned_data.get('linked_in_url')
-            skills = instance.cleaned_data.get('skills')
-            cv = instance.cleaned_data.get('cv')
-
+        print("\n"*20)
+        print(trainer.describe_yourself)
+        print(trainer.skills)
+        if request.method == 'POST':
+            city = request.POST.get('City')
+            state = request.POST.get('State')
+            country = request.POST.get('Country')
+            describe_yourself = request.POST.get('Describe Yourself')
+            skills = request.POST.get('Skills')
+            linked_in_url = request.POST.get('Linkedin')
+            print("\n"*20)
+            print(city)
+            print(state)
+            print(country)
+            print(describe_yourself)
+            print(skills)
+            print(linked_in_url)
             trainer.city = city
             trainer.state = state
             trainer.country = country
-            trainer.profile_picture = profile_picture
             trainer.describe_yourself = describe_yourself
-            trainer.linked_in_url = linked_in_url
             trainer.skills = skills
-            trainer.cv = cv
+            trainer.linked_in_url = linked_in_url
             trainer.save()
-            return HttpResponseRedirect("/trainer_profile_updated/")            
         else:
-            messages.error(request, 'Something went wrong.')
-            form = UpdateTrainerProfileForm(request.POST, request.FILES or None)
-            context = {"form": form}
+            form = UpdateTrainerProfileForm(initial=model_to_dict(trainer))
     else:
         return HttpResponseRedirect("/not_a_trainer/")
-    return render(request, "trainer_update_profile.html", context)
+    return render(request, "trainer_update_profile.html", {'trainer':trainer})
 
 
 @login_required(login_url='/login/', redirect_field_name='next')

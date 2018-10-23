@@ -1,0 +1,103 @@
+{% extends 'dashboard_base.html' %}
+{% load staticfiles %}
+{% load crispy_forms_tags %}
+{% load widget_tweaks %}
+
+
+{% block 'title' %} Trainer {% endblock %}
+
+{% block 'head' %}
+    <link rel="stylesheet" href="/static/css/tagify.css">
+    <script src="/static/js/tagify.min.js"></script>
+{% endblock %}
+
+{% block 'side_bar' %}
+<li class="nav-item">
+    <a class="nav-link" href="/trainer_dashboard/">
+      <i class="material-icons">dashboard</i>
+      <p>Dashboard</p>
+    </a>
+</li>
+<li class="nav-item active">
+    <a class="nav-link" href="/trainer_update_profile/">
+        <i class="material-icons">person_add</i>
+        <p>Update Profile</p>
+    </a>
+</li>
+{% endblock %}
+
+{% block 'dashboard_title' %} Trainer {% endblock %}
+
+{% block 'content' %}
+    <div class="content">
+        <div class="container-fluid">
+            {% for message in messages %} 
+                <div class="alert alert-{{ message.tags }} alert-with-icon col-11 col-md-4" data-notify="container" data-notify-position="top-right" style="display: inline-block; margin: 15px auto; position: fixed; transition: all 0.5s ease-in-out 0s; z-index: 1031; top: 35px; right: 20px;">
+                    <i class="material-icons" data-notify="icon">add_alert</i>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <i class="material-icons">close</i>
+                    </button>
+                    <span data-notify="message">{{ message }}</span>
+                </div>
+            {% endfor %}
+            <div class="card">
+                <div class="card-header card-header-primary">
+                  <h4 class="card-title">Update Profile</h4>
+                  <p class="card-category">Please fill in the details.</p>
+                </div>
+                <div class="card-body">
+                    <form enctype="multipart/form-data" action="" method="POST">{% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="bmd-label-floating">City</label>
+                                    <input type="text" class="form-control" name="City" value="{{ trainer.city }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="bmd-label-floating">State</label>
+                                    <input type="text" class="form-control" name="State" value="{{ trainer.state }}">
+                                </div>
+                            </div>
+                         <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="bmd-label-floating">Country</label>
+                                    <input type="text" class="form-control" name="Country" value="{{ trainer.country }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="bmd-label-floating">Linkedin URL</label>
+                                    <input type="text" class="form-control" name="Linkedin" value="{{ trainer.linked_in_url }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="bmd-label-floating">Skills</label>
+                                    <input type="text" class="form-control" name="Skills" data-role="tagsinput" value="{{ trainer.skills }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="bmd-label-floating">Describe Yourself</label>
+                                    <textarea class="form-control" name="Describe Yourself" rows="3">{{ trainer.describe_yourself }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary pull-right">Update Profile</button>
+                        <div class="clearfix"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var input = document.querySelector('input[name=Skills]'),
+        tagify = new Tagify( input );
+    </script>
+{% endblock %}

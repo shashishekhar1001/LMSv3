@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.sites.shortcuts import get_current_site
+from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from .forms import *
@@ -64,11 +65,11 @@ def custom_user_creation(request):
             # [u.email], 
             # fail_silently=False)
             send_mail('Click the link below to activate yor Account for ' + "localhost:8080", 
-            "http://" + "localhost:8080" +'/authentication/activate_user/?ak=' + ak, 
+            "http://" + "localhost:8080" +'/activate_user/?ak=' + ak, 
             settings.EMAIL_HOST_USER,
             [u.email], 
             fail_silently=False)
-            activation_link = "http://" + "localhost:8080" +'/authentication/activate_user/?ak=' + ak
+            activation_link = "http://" + "localhost:8080" +'/activate_user/?ak=' + ak
             print(activation_link)
             print("\n"*20)
             return HttpResponseRedirect('/activation_mail_sent')
