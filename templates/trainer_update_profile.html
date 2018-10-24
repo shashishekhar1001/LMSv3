@@ -9,6 +9,39 @@
 {% block 'head' %}
     <link rel="stylesheet" href="/static/css/tagify.css">
     <script src="/static/js/tagify.min.js"></script>
+    <style>
+        .tagify{
+            overflow: auto;
+            word-break: break-word;
+            border: 0px;
+        }
+        
+        #imageUpload
+        {
+            display: none;
+        }
+
+        #profileImage
+        {
+            cursor: pointer;
+        }
+
+        #profile-container {
+            width: 150px;
+            height: 150px;
+            overflow: hidden;
+            -webkit-border-radius: 50%;
+            -moz-border-radius: 50%;
+            -ms-border-radius: 50%;
+            -o-border-radius: 50%;
+            border-radius: 50%;
+        }
+
+        #profile-container img {
+            width: 150px;
+            height: 150px;
+        }
+    </style>
 {% endblock %}
 
 {% block 'side_bar' %}
@@ -89,6 +122,23 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="bmd-label-floating">Profile Picture</label>
+                                    <div id="profile-container">
+                                        <image id="profileImage" src="http://lorempixel.com/100/100" />
+                                     </div>
+                                    <input id="imageUpload" type="file" name="profile_photo" placeholder="Photo" capture>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="bmd-label-floating">Describe Yourself</label>
+                                    <textarea class="form-control" name="Describe Yourself" rows="3">{{ trainer.describe_yourself }}</textarea>
+                                </div>
+                            </div>
+                        </div>
                         <button type="submit" class="btn btn-primary pull-right">Update Profile</button>
                         <div class="clearfix"></div>
                     </form>
@@ -96,8 +146,27 @@
             </div>
         </div>
     </div>
-    <script>
-        var input = document.querySelector('input[name=Skills]'),
-        tagify = new Tagify( input );
-    </script>
+    {% block 'end' %}
+        <script>
+            var input = document.querySelector('input[name=Skills]'),
+            tagify = new Tagify( input );
+        </script>
+        
+        <script>
+            $("#profileImage").click(function(e) {
+                $("#imageUpload").click();
+            });
+
+            function fasterPreview( uploader ) {
+                if ( uploader.files && uploader.files[0] ){
+                    $('#profileImage').attr('src', 
+                        window.URL.createObjectURL(uploader.files[0]) );
+                }
+            }
+
+            $("#imageUpload").change(function(){
+                fasterPreview( this );
+            });
+        </script>
+    {% endblock %}
 {% endblock %}
