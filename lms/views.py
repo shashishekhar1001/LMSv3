@@ -25,13 +25,6 @@ def trainer_update_profile(request):
             describe_yourself = request.POST.get('Describe Yourself')
             skills = request.POST.get('Skills')
             linked_in_url = request.POST.get('Linkedin')
-            print("\n"*20)
-            print(city)
-            print(state)
-            print(country)
-            print(describe_yourself)
-            print(skills)
-            print(linked_in_url)
             trainer.city = city
             trainer.state = state
             trainer.country = country

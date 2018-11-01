@@ -31,7 +31,7 @@ class Trainer_Model(models.Model):
     city = models.CharField(max_length=30)
     state = models.CharField(max_length=30)
     country = models.CharField(max_length=30)
-    profile_picture = models.ImageField(upload_to='profile_pics/%Y/%m/%d/', blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/%Y/%m/%d/', default="user.png")
     courses_tutoring = models.TextField()
     describe_yourself = models.TextField()
     linked_in_url = models.URLField()
