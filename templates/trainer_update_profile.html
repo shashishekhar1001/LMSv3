@@ -7,6 +7,7 @@
 {% block 'title' %} Trainer {% endblock %}
 
 {% block 'head' %}
+<link href="{% static 'css/cropper.min.css' %}" rel="stylesheet">
 <style>
     /*
     * bootstrap-tagsinput v0.8.0
@@ -85,6 +86,32 @@
     margin-top: -52px;
   }
 </style>
+<style>
+  .btn-file {
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-file input[type=file] {
+      position: absolute;
+      top: 0;
+      right: 0;
+      min-width: 100%;
+      min-height: 100%;
+      font-size: 100px;
+      text-align: right;
+      filter: alpha(opacity=0);
+      opacity: 0;
+      outline: none;
+      background: white;
+      cursor: inherit;
+      display: block;
+      text-align: -webkit-xcenter;
+  }
+
+  #img-upload{
+      width: 100%;
+  }
+</style>
 {% endblock %}
 
 {% block 'side_bar' %}
@@ -120,9 +147,13 @@
               <div class="card-header card-header-primary">
                 <h4 class="card-title">Update Profile</h4>
                 <p class="card-category">Please fill in the details.</p>
-                <div class="card-avatar">
-                  <a href="">
-                    <img class="profile_img" src="https://images.financialexpress.com/2016/02/cristiano-ronaldo-re-8.jpg" />
+                <div class="card-avatar" data-toggle="modal" data-target="#image_modal">
+                  <a>
+                    {% if trainer.profile_picture == 'user.png' %}
+                      <img class="profile_img" src="/media/65U.svg" alt="{{ trainer.profile_picture }}"/>
+                    {% else %}
+                      <img class="profile_img" src="/media/{{ trainer.profile_picture }}" alt="{{ trainer.profile_picture }}"/>
+                    {% endif %}
                   </a>
                 </div>
               </div> 
@@ -182,6 +213,55 @@
               </div>
             </div>
         </div>
+    </div>
+    <!-- Modal -->
+    <div id="image_modal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+    
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Update Profile Picture</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+              <div class="col-md-12">
+                  <div class="form-group">
+                      <div class="input-group">
+                          <span class="input-group-btn">
+                              <span class="btn btn-default btn-file">
+                                  Browse… <input type="file" id="imgInp" accept="image/*">
+                              </span>
+                          </span>
+                          <input type="text" class="form-control image_name" style="text-align:center; margin: auto; background: #9b57c6; color: white;" readonly />
+                      </div>
+                      <br>
+                      <div>
+                        <img id='img-upload' style="max-width: 100%;" />
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer">
+              <div class="btn-group" id="img_controls" role="group">
+                  <button type="button" class="btn btn-default js-zoom-in">
+                      <i class="fa fa-search-plus" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="btn btn-default js-zoom-out">
+                      <i class="fa fa-search-minus" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="btn btn-default js-rotate-right">
+                      <i class="fa fa-repeat" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" class="btn btn-default js-rotate-left">
+                      <i class="fa fa-undo" aria-hidden="true"></i>
+                  </button>
+              </div>
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Update</button>
+          </div>
+        </div>
+    
+      </div>
     </div>
     {% block 'end' %}
     <script>
@@ -873,6 +953,49 @@
                 $("input[data-role=tagsinput], select[multiple][data-role=tagsinput]").tagsinput();
               });
             })(window.jQuery);
+    </script>
+    <script src="{% static 'js/cropper.min.js' %}"></script>
+    <script>
+      $(document).ready( function() {
+      
+      $("#img_controls").hide();
+
+    	$(document).on('change', '.btn-file :file', function() {
+      var input = $(this),
+        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+        input.trigger('fileselect', [label]);
+        $("#img_controls").show();
+        var $image = $('#img-upload');
+      });
+
+      $('.btn-file :file').on('fileselect', function(event, label) {
+          
+          var input = $(this).parents('.input-group').find(':text'),
+              log = label;
+          
+          if( input.length ) {
+              input.val(log);
+          } else {
+              if( log ) alert(log);
+          }
+        
+      });
+      function readURL(input) {
+          if (input.files && input.files[0]) {
+              var reader = new FileReader();
+              
+              reader.onload = function (e) {
+                  $('#img-upload').attr('src', e.target.result);
+              }
+              
+              reader.readAsDataURL(input.files[0]);
+          }
+      }
+
+      $("#imgInp").change(function(){
+          readURL(this);
+      }); 	
+    });
     </script>
     {% endblock %}
 {% endblock %}
