@@ -15,9 +15,6 @@ def trainer_update_profile(request):
     cu = Custom_User.objects.get(user=user)
     if cu.primary_registration_type == "Trainer":
         trainer = Trainer_Model.objects.get(user=cu)
-        print("\n"*20)
-        print(trainer.describe_yourself)
-        print(trainer.skills)
         if request.method == 'POST':
             city = request.POST.get('City')
             state = request.POST.get('State')

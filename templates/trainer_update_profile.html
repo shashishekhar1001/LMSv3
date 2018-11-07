@@ -7,7 +7,8 @@
 {% block 'title' %} Trainer {% endblock %}
 
 {% block 'head' %}
-<link href="{% static 'css/cropper.min.css' %}" rel="stylesheet">
+<!-- <link href="{% static 'css/cropper.css' %}" rel="stylesheet"> -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/imgareaselect/0.9.10/css/imgareaselect-default.css">
 <style>
     /*
     * bootstrap-tagsinput v0.8.0
@@ -108,7 +109,7 @@
       text-align: -webkit-xcenter;
   }
 
-  #img-upload{
+  #image{
       width: 100%;
   }
 </style>
@@ -152,7 +153,7 @@
                     {% if trainer.profile_picture == 'user.png' %}
                       <img class="profile_img" src="/media/65U.svg" alt="{{ trainer.profile_picture }}"/>
                     {% else %}
-                      <img class="profile_img" src="/media/{{ trainer.profile_picture }}" alt="{{ trainer.profile_picture }}"/>
+                      <img class="profile_img" src="/media/{{ trainer.profile_picture }}" alt="{{ trainer.profile_picture }}" />
                     {% endif %}
                   </a>
                 </div>
@@ -236,8 +237,8 @@
                           <input type="text" class="form-control image_name" style="text-align:center; margin: auto; background: #9b57c6; color: white;" readonly />
                       </div>
                       <br>
-                      <div>
-                        <img id='img-upload' style="max-width: 100%;" />
+                      <div class="img-container" style="overflow:hidden;">
+                          <img id="image">
                       </div>
                   </div>
               </div>
@@ -954,7 +955,8 @@
               });
             })(window.jQuery);
     </script>
-    <script src="{% static 'js/cropper.min.js' %}"></script>
+    <!-- <script src="{% static 'js/cropper.js' %}"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/imgareaselect/0.9.10/js/jquery.imgareaselect.pack.js"></script>
     <script>
       $(document).ready( function() {
       
@@ -965,7 +967,9 @@
         label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
         input.trigger('fileselect', [label]);
         $("#img_controls").show();
-        var $image = $('#img-upload');
+        $('#image').imgAreaSelect({
+          handles: true
+        });
       });
 
       $('.btn-file :file').on('fileselect', function(event, label) {
@@ -985,7 +989,7 @@
               var reader = new FileReader();
               
               reader.onload = function (e) {
-                  $('#img-upload').attr('src', e.target.result);
+                  $('#image').attr('src', e.target.result);
               }
               
               reader.readAsDataURL(input.files[0]);
@@ -997,5 +1001,34 @@
       }); 	
     });
     </script>
-    {% endblock %}
+    <script>
+      console.log("Image Controls");
+      var angle = 0;
+      $('.js-rotate-right').on('click', function() {
+          angle += 15;
+          $('#image').css('transform','rotate(' + angle + 'deg)');
+      });
+      $('.js-rotate-left').on('click', function() {
+          angle -= 15;
+          $('#image').css('transform','rotate(' + angle + 'deg)');
+      });
+      var scale = 1;
+      $('.js-zoom-in').on('click', function() {
+          scale += 0.25;
+          if(scale == 2.25){
+            scale = 2;
+          }
+          console.log(scale);
+          $('#image').css('transform','scale(' + scale + ')');
+      });
+      $('.js-zoom-out').on('click', function() {
+          scale -= 0.25;
+          console.log(scale);
+          if(scale == 0){
+            scale = 0.25;
+          }
+          $('#image').css('transform','scale(' + scale + ')');
+      });
+    </script>
+  {% endblock %}
 {% endblock %}
